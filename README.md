@@ -13,7 +13,7 @@ Developed by **Group 17** —
 ## 🌟 Key Features
 
 ✅ **Landmark Recognition**  
-Upload a photo → instantly get the landmark name & location (e.g., “Sigiriya – Matale”).
+Upload a photo → instantly get the landmark name & location (e.g., “Sigiriya – Matale, Central Province, Sri Lanka”).
 
 🎙️ **Digital Storyteller Engine** *(Jaleel’s Contribution)*  
 Receive an **AI-generated animated video + voice narration** explaining the landmark’s history, culture, and significance.  
