@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 import os
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import streamlit as st
 from PIL import Image
-from Classifier import init_classifier, get_prediction  # ← lowercase import
+from classifier import init_classifier, get_prediction
 
 st.set_page_config(page_title="Landmark Recognition", page_icon="🏛️")
 
