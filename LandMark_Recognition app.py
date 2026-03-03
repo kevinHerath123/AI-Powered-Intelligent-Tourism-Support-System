@@ -34,6 +34,5 @@ if uploaded_file is not None:
     st.success("✅ Prediction Complete!")
     st.write(f"**Landmark:** {result['name'].strip()}")
     st.write(f"**Location:** {result['place'].strip()}")
-    st.write(f"**Confidence:** {result['confidence']:.2%}")
 else:
     st.info("👆 Please upload an image to get started.")
