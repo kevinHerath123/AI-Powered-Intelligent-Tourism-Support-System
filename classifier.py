@@ -12,7 +12,7 @@ import json
 # -----------------------------------------------------------------------------
 # CONFIGURATION (Relative Paths)
 # -----------------------------------------------------------------------------
-MODEL_PATH = 'C:/Users/Lap.lk/Desktop/ML_VIVA/FineTuned-EfficientNetB0_CNN_Model.keras'
+MODEL_PATH = 'C:/Users/Lap.lk/Desktop/ML_VIVA/FineTuned-EfficientNetB0_CNN_Model'
 CLASS_NAMES_PATH = 'C:/Users/Lap.lk/Desktop/ML_VIVA/class_names.json'
 
 # -----------------------------------------------------------------------------
