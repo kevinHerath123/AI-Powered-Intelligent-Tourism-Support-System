@@ -6,14 +6,13 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TF warnings
 import tensorflow as tf
 import cv2
 import numpy as np
-from PIL import Image
 import json
 
 # -----------------------------------------------------------------------------
 # CONFIGURATION (Relative Paths)
 # -----------------------------------------------------------------------------
-MODEL_PATH = 'C:/Users/Lap.lk/Desktop/ML_VIVA/FineTuned-EfficientNetB0_CNN_Model.h5'
-CLASS_NAMES_PATH = 'C:/Users/Lap.lk/Desktop/ML_VIVA/class_names.json'
+MODEL_PATH = 'FineTuned-EfficientNetB0_CNN_Model.h5'
+CLASS_NAMES_PATH = 'class_names.json'
 
 # -----------------------------------------------------------------------------
 # LOCATION MAPPING
