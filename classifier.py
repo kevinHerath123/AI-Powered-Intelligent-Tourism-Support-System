@@ -1,16 +1,20 @@
-"""Landmark Classifier App - For Streamlit Deployment"""
+# -*- coding: utf-8 -*-
+"""Landmark Classifier App - For Streamlit Cloud Deployment"""
 
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TF warnings
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import tensorflow as tf
 import cv2
 import numpy as np
+from PIL import Image
 import json
 
 # -----------------------------------------------------------------------------
 # CONFIGURATION (Relative Paths)
 # -----------------------------------------------------------------------------
+# Make sure this matches your actual file extension (.h5 or .keras)
 MODEL_PATH = 'FineTuned-EfficientNetB0_CNN_Model.h5'
 CLASS_NAMES_PATH = 'class_names.json'
 
@@ -44,6 +48,7 @@ LOCATION_MAP = {
     "Yapahuwa Rock Fortress ": "Yapahuwa, North Western Province, Sri Lanka ",
 }
 
+
 # -----------------------------------------------------------------------------
 # CLASSIFIER CLASS
 # -----------------------------------------------------------------------------
@@ -61,13 +66,28 @@ class LandmarkClassifier:
         if not os.path.exists(self.classes_path):
             raise FileNotFoundError(f"Class names file not found at {self.classes_path}")
 
-        self.model = tf.keras.models.load_model(self.model_path)
+        # ✅ KEY CHANGE: Added safe_mode=False to bypass Lambda layer error
+        self.model = tf.keras.models.load_model(self.model_path, safe_mode=False)
+
         with open(self.classes_path, 'r') as f:
             self.class_names = json.load(f)
 
-
     def predict(self, image_input):
-        img_batch = self.preprocess_image(image_input)
+        # Load image
+        if isinstance(image_input, str):
+            img = Image.open(image_input).convert('RGB')
+        elif isinstance(image_input, Image.Image):
+            img = image_input.convert('RGB')
+        else:
+            raise ValueError("Input must be file path or PIL Image")
+
+        # Preprocess: Resize to 290x290, Normalize to 0-1 (Matches Training)
+        img_array = np.array(img)
+        img_resized = cv2.resize(img_array, (290, 290))
+        img_normalized = img_resized / 255.0
+        img_batch = np.expand_dims(img_normalized, axis=0)
+
+        # Predict
         predictions = self.model.predict(img_batch, verbose=0)
         pred_idx = np.argmax(predictions[0])
         landmark_name = self.class_names[pred_idx]
@@ -79,19 +99,20 @@ class LandmarkClassifier:
             'confidence': float(np.max(predictions[0]))
         }
 
+
 # -----------------------------------------------------------------------------
 # INITIALIZATION
 # -----------------------------------------------------------------------------
 classifier = None
 
+
 def init_classifier(model_path=MODEL_PATH, classes_path=CLASS_NAMES_PATH):
-    """Initialize the classifier manually"""
     global classifier
     classifier = LandmarkClassifier(model_path, classes_path)
     return classifier
 
+
 def get_prediction(image_input):
-    """Get prediction using initialized classifier"""
     if classifier is None:
         raise RuntimeError("Classifier not initialized. Call init_classifier() first.")
     return classifier.predict(image_input)
