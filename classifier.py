@@ -12,7 +12,7 @@ import json
 # -----------------------------------------------------------------------------
 # CONFIGURATION (Relative Paths)
 # -----------------------------------------------------------------------------
-MODEL_PATH = 'C:/Users/Lap.lk/Desktop/ML_VIVA/FineTuned-EfficientNetB0_CNN_Model/model.weights.h5'
+MODEL_PATH = 'C:/Users/Lap.lk/Desktop/ML_VIVA/FineTuned-EfficientNetB0_CNN_Model.h5'
 CLASS_NAMES_PATH = 'C:/Users/Lap.lk/Desktop/ML_VIVA/class_names.json'
 
 # -----------------------------------------------------------------------------
@@ -66,18 +66,6 @@ class LandmarkClassifier:
         with open(self.classes_path, 'r') as f:
             self.class_names = json.load(f)
 
-    def preprocess_image(self, image_input):
-        if isinstance(image_input, str):
-            img = Image.open(image_input).convert('RGB')
-        elif isinstance(image_input, Image.Image):
-            img = image_input.convert('RGB')
-        else:
-            raise ValueError("Input must be a file path string or PIL Image object")
-
-        img_array = np.array(img)
-        img_resized = cv2.resize(img_array, (290, 290))
-        img_normalized = img_resized / 255.0
-        return np.expand_dims(img_normalized, axis=0)
 
     def predict(self, image_input):
         img_batch = self.preprocess_image(image_input)
