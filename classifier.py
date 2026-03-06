@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 """Landmark Classifier App - For Streamlit Cloud Deployment"""
 
 import os
-
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import tensorflow as tf
@@ -14,7 +12,6 @@ import json
 # -----------------------------------------------------------------------------
 # CONFIGURATION (Relative Paths)
 # -----------------------------------------------------------------------------
-# Make sure this matches your actual file extension (.h5 or .keras)
 MODEL_PATH = 'FineTuned-EfficientNetB0_CNN_Model.h5'
 CLASS_NAMES_PATH = 'class_names.json'
 
@@ -66,14 +63,13 @@ class LandmarkClassifier:
         if not os.path.exists(self.classes_path):
             raise FileNotFoundError(f"Class names file not found at {self.classes_path}")
 
-        # ✅ KEY CHANGE: Added safe_mode=False to bypass Lambda layer error
+        # Load model with safe_mode=False for Lambda layer
         self.model = tf.keras.models.load_model(self.model_path, safe_mode=False)
 
         with open(self.classes_path, 'r') as f:
             self.class_names = json.load(f)
 
     def predict(self, image_input):
-        # Load image
         if isinstance(image_input, str):
             img = Image.open(image_input).convert('RGB')
         elif isinstance(image_input, Image.Image):
@@ -81,13 +77,11 @@ class LandmarkClassifier:
         else:
             raise ValueError("Input must be file path or PIL Image")
 
-        # Preprocess: Resize to 290x290, Normalize to 0-1 (Matches Training)
         img_array = np.array(img)
         img_resized = cv2.resize(img_array, (290, 290))
         img_normalized = img_resized / 255.0
         img_batch = np.expand_dims(img_normalized, axis=0)
 
-        # Predict
         predictions = self.model.predict(img_batch, verbose=0)
         pred_idx = np.argmax(predictions[0])
         landmark_name = self.class_names[pred_idx]
@@ -105,12 +99,10 @@ class LandmarkClassifier:
 # -----------------------------------------------------------------------------
 classifier = None
 
-
 def init_classifier(model_path=MODEL_PATH, classes_path=CLASS_NAMES_PATH):
     global classifier
     classifier = LandmarkClassifier(model_path, classes_path)
     return classifier
-
 
 def get_prediction(image_input):
     if classifier is None:
