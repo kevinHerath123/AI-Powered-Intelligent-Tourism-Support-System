@@ -13,7 +13,7 @@ st.set_page_config(page_title="Sri Lanka Landmark Recognition", page_icon="ğŸ›ï
 # Simple custom styling
 st.markdown("""
 <style>
-    .stApp { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
+    .stApp { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); }
     .result-box { background: white; padding: 1.5rem; border-radius: 15px; margin: 1rem 0; }
     .confidence-high { color: #22c55e; font-weight: bold; }
     .confidence-med { color: #f59e0b; font-weight: bold; }
