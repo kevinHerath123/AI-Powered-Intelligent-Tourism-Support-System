@@ -70,6 +70,7 @@ class LandmarkClassifier:
             self.class_names = json.load(f)
 
     def predict(self, image_input):
+        # Load image
         if isinstance(image_input, str):
             img = Image.open(image_input).convert('RGB')
         elif isinstance(image_input, Image.Image):
@@ -77,20 +78,24 @@ class LandmarkClassifier:
         else:
             raise ValueError("Input must be file path or PIL Image")
 
+        # Preprocess
         img_array = np.array(img)
         img_resized = cv2.resize(img_array, (290, 290))
         img_normalized = img_resized / 255.0
         img_batch = np.expand_dims(img_normalized, axis=0)
 
+        # Predict
         predictions = self.model.predict(img_batch, verbose=0)
         pred_idx = np.argmax(predictions[0])
+
         landmark_name = self.class_names[pred_idx]
-        location = LOCATION_MAP.get(landmark_name, "Unknown Location")
+
+        # ✅ FIX: Strip spaces from landmark_name BEFORE lookup
+        location = LOCATION_MAP.get(landmark_name.strip(), "Unknown Location")
 
         return {
             'name': landmark_name,
-            'place': location,
-            'confidence': float(np.max(predictions[0]))
+            'place': location
         }
 
 
