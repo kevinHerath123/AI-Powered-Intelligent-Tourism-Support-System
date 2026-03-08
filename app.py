@@ -8,12 +8,12 @@ from PIL import Image
 from classifier import init_classifier, get_prediction
 
 # Page config
-st.set_page_config(page_title="🏛️ Sri Lanka Landmark Recognition", page_icon="🏛️", layout="centered")
+st.set_page_config(page_title="Sri Lanka Landmark Recognition", page_icon="🏛️", layout="centered")
 
 # Simple custom styling
 st.markdown("""
 <style>
-    .stApp { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .stApp { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
     .result-box { background: white; padding: 1.5rem; border-radius: 15px; margin: 1rem 0; }
     .confidence-high { color: #22c55e; font-weight: bold; }
     .confidence-med { color: #f59e0b; font-weight: bold; }
@@ -56,19 +56,10 @@ if uploaded_file:
     st.write(f"**🏛️ Landmark:** {result['name'].strip()}")
     st.write(f"**📍 Location:** {result['place'].strip()}")
 
-    # Simple confidence indicator
-    conf = result['confidence']
-    if conf >= 0.8:
-        st.markdown(f"**🎯 Confidence:** <span class='confidence-high'>{conf:.1%}</span>", unsafe_allow_html=True)
-    elif conf >= 0.6:
-        st.markdown(f"**🎯 Confidence:** <span class='confidence-med'>{conf:.1%}</span>", unsafe_allow_html=True)
-    else:
-        st.markdown(f"**🎯 Confidence:** <span class='confidence-low'>{conf:.1%}</span>", unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
 
 else:
     st.info("👆 Upload an image to get started")
 
 # Simple footer
 st.markdown("---")
-st.caption("Built with TensorFlow & Streamlit • AI-Powered Tourism Support")
+st.caption("AI-Powered Intelligent Tourism Support System")
