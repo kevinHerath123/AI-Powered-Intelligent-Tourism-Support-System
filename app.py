@@ -26,7 +26,7 @@ st.markdown("""
 
     /* Main title - visible at top, larger font */
     .main-title {
-        font-size: 7rem;
+        font-size: 15rem;
         font-weight: bold;
         text-align: center;
         color: #ffffff;
@@ -38,7 +38,7 @@ st.markdown("""
     .subtitle {
         text-align: center;
         color: #c8c8c8;
-        font-size: 5rem;
+        font-size: 12rem;
         margin: 0rem 0 2.5rem 0 !important;
         padding: 0 !important;
         
@@ -47,7 +47,7 @@ st.markdown("""
     /* Result card */
     .result-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 15px;
+        border-radius: 20px;
         padding: 1.5rem;
         color: white;
         margin: 1.5rem 0;
@@ -57,7 +57,7 @@ st.markdown("""
     /* Upload section - NO PADDING */
     .upload-section {
         background: rgba(255, 255, 255, 0.05);
-        border-radius: 15px;
+        border-radius: 18px;
         padding: 0 !important;
         margin: 0.5rem 0 !important;
     }
@@ -126,7 +126,7 @@ st.markdown("""
 # -----------------------------------------------------------------------------
 # HERO SECTION - NO EXTRA SPACING
 # -----------------------------------------------------------------------------
-st.markdown('<p class="main-title">📍 Sri Lanka Landmark Recognition</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-title">🏛️ Sri Lanka Landmark Recognition</p>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Discover the beauty of Sri Lanka with AI-powered image recognition</p>',
             unsafe_allow_html=True)
 
@@ -192,6 +192,6 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown("""
 <div class="footer">
     <p style="margin: 0;">🇱🇰 AI-Powered Intelligent Tourism Support System</p>
-    <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; opacity: 1.2;">© 2026</p>
+    <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; opacity: 0.2;">© 2026</p>
 </div>
 """, unsafe_allow_html=True)
