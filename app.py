@@ -26,7 +26,7 @@ st.markdown("""
 
     /* Main title - visible at top, larger font */
     .main-title {
-        font-size: 15rem;
+        font-size: 22rem;
         font-weight: bold;
         text-align: center;
         color: #ffffff;
@@ -38,7 +38,7 @@ st.markdown("""
     .subtitle {
         text-align: center;
         color: #c8c8c8;
-        font-size: 12rem;
+        font-size: 20rem;
         margin: 0rem 0 2.5rem 0 !important;
         padding: 0 !important;
         
@@ -47,7 +47,7 @@ st.markdown("""
     /* Result card */
     .result-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 20px;
+        border-radius: 13px;
         padding: 1.5rem;
         color: white;
         margin: 1.5rem 0;
@@ -57,7 +57,7 @@ st.markdown("""
     /* Upload section - NO PADDING */
     .upload-section {
         background: rgba(255, 255, 255, 0.05);
-        border-radius: 18px;
+        border-radius: 12px;
         padding: 0 !important;
         margin: 0.5rem 0 !important;
     }
@@ -175,10 +175,10 @@ else:
     # Placeholder
     st.markdown("""
     <div style="text-align: center; padding: 1rem; color: #b8b8b8;">
-        <div style="font-size: 3rem; margin-bottom: 0.5rem;">📸</div>
+        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📸</div>
         <h3 style="margin: 0.5rem 0; font-size: 1.5rem;">Ready to Explore?</h3>
         <p style="margin: 0.5rem 0; font-size: 1.1rem;">Upload a photo of a Sri Lankan landmark above to get started!</p>
-        <p style="font-size: 0.9rem; color: #666; margin: 0.5rem 0;">
+        <p style="font-size: 0.9rem; color: #FCFAFA; margin: 0.5rem 0;">
             💡 Tip: Clear, well-lit photos work best
         </p>
     </div>
