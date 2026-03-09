@@ -10,7 +10,7 @@ from classifier import get_prediction
 # Page config
 st.set_page_config(
     page_title=" Sri Lanka Landmark Recognition",
-    page_icon="📍",
+    page_icon="🏛️",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
@@ -31,16 +31,17 @@ st.markdown("""
         text-align: center;
         color: #ffffff;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        margin: 0.4rem 0 0.3rem 0 !important;
+        margin: 8rem 0 0.3rem 0 !important;
     }
 
     /* Subtitle - larger font */
     .subtitle {
         text-align: center;
         color: #c8c8c8;
-        font-size: 1.5rem;
-        margin: 0 !important;
+        font-size: 2.5rem;
+        margin: 0rem 0 3rem 0 !important;
         padding: 0 !important;
+        
     }
 
     /* Result card */
