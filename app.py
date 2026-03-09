@@ -18,9 +18,9 @@ st.set_page_config(
 # Custom CSS for styling
 st.markdown("""
 <style>
-    /* Dark gradient background */
+    /* Darker gradient background */
     .stApp {
-        background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%);
         min-height: 100vh;
     }
 
@@ -39,7 +39,7 @@ st.markdown("""
         text-align: center;
         color: #b8b8b8;
         font-size: 1.1rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
     }
 
     /* Result card */
@@ -52,29 +52,51 @@ st.markdown("""
         box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
     }
 
-    /* Upload section */
+    /* Upload section - remove extra padding */
     .upload-section {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
         border-radius: 15px;
-        padding: 1.5rem;
+        padding: 1rem;
         backdrop-filter: blur(10px);
-        margin: 1.5rem 0;
+        margin-top: 0.5rem;
     }
 
-    /* Footer */
+    /* Remove padding above uploader label */
+    .stFileUploader {
+        margin-top: 0rem !important;
+        padding-top: 0rem !important;
+    }
+
+    .stFileUploader label {
+        margin-top: 0rem !important;
+        padding-top: 0rem !important;
+    }
+
+    /* Footer - full width */
     .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100vw;
         text-align: center;
-        color: #888888;
-        font-size: 0.9rem;
-        margin-top: 3rem;
+        color: #666666;
+        font-size: 0.85rem;
         padding: 1rem;
-        border-top: 1px solid rgba(255,255,255,0.1);
+        border-top: 1px solid rgba(255,255,255,0.08);
+        background: rgba(10, 10, 15, 0.95);
+        margin-left: calc(-50vw + 50%);
     }
 
     /* Hide Streamlit branding */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     .stDeployButton {visibility: hidden;}
+
+    /* Remove extra padding from containers */
+    .block-container {
+        padding-top: 2rem !important;
+        padding-bottom: 4rem !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -129,11 +151,11 @@ if uploaded_file:
 else:
     # Placeholder
     st.markdown("""
-    <div style="text-align: center; padding: 2rem; color: #b8b8b8;">
-        <div style="font-size: 3rem; margin-bottom: 1rem;">📸</div>
-        <h3>Ready to Explore?</h3>
-        <p>Upload a photo of a Sri Lankan landmark above to get started!</p>
-        <p style="font-size: 0.9rem; color: #888;">
+    <div style="text-align: center; padding: 1.5rem; color: #b8b8b8;">
+        <div style="font-size: 3rem; margin-bottom: 0.5rem;">📸</div>
+        <h3 style="margin: 0.5rem 0;">Ready to Explore?</h3>
+        <p style="margin: 0.5rem 0;">Upload a photo of a Sri Lankan landmark above to get started!</p>
+        <p style="font-size: 0.85rem; color: #666; margin: 0.5rem 0;">
             💡 Tip: Clear, well-lit photos work best
         </p>
     </div>
@@ -142,12 +164,12 @@ else:
 st.markdown('</div>', unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# FOOTER
+# FOOTER - Full Width
 # -----------------------------------------------------------------------------
 st.markdown("""
 <div class="footer">
-    <p>🇱🇰 <strong>AI-Powered Intelligent Tourism Support System</strong></p>
-    <p>Built with TensorFlow • Streamlit • EfficientNetB0</p>
-    <p style="font-size: 0.8rem; opacity: 0.8;">© 2026</p>
+    <p style="margin: 0;">🇱🇰 <strong>AI-Powered Intelligent Tourism Support System</strong></p>
+    <p style="margin: 0.3rem 0 0 0; font-size: 0.75rem; opacity: 0.7;">Built with TensorFlow • Streamlit • EfficientNetB0</p>
+    <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; opacity: 0.5;">© 2026</p>
 </div>
 """, unsafe_allow_html=True)
