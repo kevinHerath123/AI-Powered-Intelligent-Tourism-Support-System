@@ -19,7 +19,7 @@ CLASS_NAMES_PATH = 'class_names.json'
 # LOCATION MAPPING
 # -----------------------------------------------------------------------------
 LOCATION_MAP = {
-    "Adam's Peak": "Rathnapura, Sabaragamuwa Province, Sri Lanka",
+    "Adams Peak": "Rathnapura, Sabaragamuwa Province, Sri Lanka",
     "Ancient City of Polonnaruwa": "Polonnaruwa, North Central Province, Sri Lanka",
     "Beruwala Light House": "Beruwala, Western Province, Sri Lanka",
     "British War Cemetery": "Kandy, Central Province, Sri Lanka",

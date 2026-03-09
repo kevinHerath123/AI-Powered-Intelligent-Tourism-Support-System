@@ -31,7 +31,7 @@ st.markdown("""
         text-align: center;
         color: #ffffff;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        margin: 1rem 0 0.5rem 0;
+        margin: 3rem 0 0.5rem 0;
     }
 
     /* Subtitle - larger font */
@@ -61,28 +61,6 @@ st.markdown("""
         margin: 0.5rem 0;
     }
 
-    /* Remove ALL padding above uploader */
-    .stFileUploader {
-        margin-top: 0rem !important;
-        padding-top: 0rem !important;
-    }
-
-    .stFileUploader label {
-        margin-top: 0rem !important;
-        padding-top: 0rem !important;
-    }
-
-    /* Remove padding from uploader container */
-    [data-testid="stFileUploader"] {
-        margin-top: 0rem !important;
-        padding-top: 0rem !important;
-    }
-
-    [data-testid="stFileUploader"] label {
-        margin-top: 0rem !important;
-        padding-top: 0rem !important;
-    }
-
     /* Footer - full width */
     .footer {
         position: fixed;
@@ -109,10 +87,6 @@ st.markdown("""
         padding-bottom: 4rem !important;
     }
 
-    /* Remove margin from uploader section */
-    .element-container {
-        margin-top: 0rem !important;
-    }
 </style>
 """, unsafe_allow_html=True)
 
