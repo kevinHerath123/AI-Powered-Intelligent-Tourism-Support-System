@@ -9,7 +9,7 @@ from classifier import get_prediction
 
 # Page config
 st.set_page_config(
-    page_title="🏛️ Sri Lanka Landmark Recognition",
+    page_title="Sri Lanka Landmark Recognition",
     page_icon="🏛️",
     layout="centered",
     initial_sidebar_state="collapsed"
@@ -24,22 +24,22 @@ st.markdown("""
         min-height: 100vh;
     }
 
-    /* Main title */
+    /* Main title - larger font */
     .main-title {
-        font-size: 2.5rem;
+        font-size: 3.5rem;
         font-weight: bold;
         text-align: center;
         color: #ffffff;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        margin-bottom: 0.5rem;
+        margin: 1rem 0 0.5rem 0;
     }
 
-    /* Subtitle */
+    /* Subtitle - larger font */
     .subtitle {
         text-align: center;
-        color: #b8b8b8;
-        font-size: 1.1rem;
-        margin-bottom: 1rem;
+        color: #c8c8c8;
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
     }
 
     /* Result card */
@@ -52,22 +52,33 @@ st.markdown("""
         box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
     }
 
-    /* Upload section - remove extra padding */
+    /* Upload section - minimal padding */
     .upload-section {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 15px;
-        padding: 1rem;
+        padding: 0.5rem;
         backdrop-filter: blur(10px);
-        margin-top: 0.5rem;
+        margin: 0.5rem 0;
     }
 
-    /* Remove padding above uploader label */
+    /* Remove ALL padding above uploader */
     .stFileUploader {
         margin-top: 0rem !important;
         padding-top: 0rem !important;
     }
 
     .stFileUploader label {
+        margin-top: 0rem !important;
+        padding-top: 0rem !important;
+    }
+
+    /* Remove padding from uploader container */
+    [data-testid="stFileUploader"] {
+        margin-top: 0rem !important;
+        padding-top: 0rem !important;
+    }
+
+    [data-testid="stFileUploader"] label {
         margin-top: 0rem !important;
         padding-top: 0rem !important;
     }
@@ -92,10 +103,15 @@ st.markdown("""
     footer {visibility: hidden;}
     .stDeployButton {visibility: hidden;}
 
-    /* Remove extra padding from containers */
+    /* Reduce block container padding */
     .block-container {
-        padding-top: 2rem !important;
+        padding-top: 1rem !important;
         padding-bottom: 4rem !important;
+    }
+
+    /* Remove margin from uploader section */
+    .element-container {
+        margin-top: 0rem !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -136,26 +152,26 @@ if uploaded_file:
     st.image(image, caption="📷 Your Upload", use_column_width=True)
 
     # Predict
-    with st.spinner("🔍 AI is analyzing..."):
+    with st.spinner("🔍 Analyzing picture..."):
         result = get_prediction(image)
 
     # Results card
     st.markdown(f"""
     <div class="result-card">
         <h3 style="margin-top: 0;">✨ Prediction Result</h3>
-        <p style="font-size: 1.1rem;"><strong>🏛️ Landmark:</strong><br>{result['name'].strip()}</p>
-        <p style="font-size: 1.1rem;"><strong>📍 Location:</strong><br>{result['place'].strip()}</p>
+        <p style="font-size: 1.2rem;"><strong>📌 Landmark:</strong><br>{result['name'].strip()}</p>
+        <p style="font-size: 1.2rem;"><strong>📍 Location:</strong><br>{result['place'].strip()}</p>
     </div>
     """, unsafe_allow_html=True)
 
 else:
     # Placeholder
     st.markdown("""
-    <div style="text-align: center; padding: 1.5rem; color: #b8b8b8;">
+    <div style="text-align: center; padding: 1rem; color: #b8b8b8;">
         <div style="font-size: 3rem; margin-bottom: 0.5rem;">📸</div>
-        <h3 style="margin: 0.5rem 0;">Ready to Explore?</h3>
-        <p style="margin: 0.5rem 0;">Upload a photo of a Sri Lankan landmark above to get started!</p>
-        <p style="font-size: 0.85rem; color: #666; margin: 0.5rem 0;">
+        <h3 style="margin: 0.5rem 0; font-size: 1.5rem;">Ready to Explore?</h3>
+        <p style="margin: 0.5rem 0; font-size: 1.1rem;">Upload a photo of a Sri Lankan landmark above to get started!</p>
+        <p style="font-size: 0.9rem; color: #666; margin: 0.5rem 0;">
             💡 Tip: Clear, well-lit photos work best
         </p>
     </div>
