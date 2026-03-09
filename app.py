@@ -9,8 +9,8 @@ from classifier import get_prediction
 
 # Page config
 st.set_page_config(
-    page_title="Sri Lanka Landmark Recognition",
-    page_icon="🏛️",
+    page_title=" Sri Lanka Landmark Recognition",
+    page_icon="📍",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
@@ -24,22 +24,23 @@ st.markdown("""
         min-height: 100vh;
     }
 
-    /* Main title - larger font */
+    /* Main title - visible at top, larger font */
     .main-title {
         font-size: 3.5rem;
         font-weight: bold;
         text-align: center;
         color: #ffffff;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        margin: 3rem 0 0.5rem 0;
+        margin: 0.4rem 0 0.3rem 0 !important;
     }
 
     /* Subtitle - larger font */
     .subtitle {
         text-align: center;
         color: #c8c8c8;
-        font-size: 2rem;
-        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
     /* Result card */
@@ -52,13 +53,33 @@ st.markdown("""
         box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
     }
 
-    /* Upload section - minimal padding */
+    /* Upload section - NO PADDING */
     .upload-section {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 15px;
-        padding: 0.5rem;
-        backdrop-filter: blur(10px);
-        margin: 0.5rem 0;
+        padding: 0 !important;
+        margin: 0.5rem 0 !important;
+    }
+
+    /* Remove ALL padding/margin from uploader */
+    .stFileUploader {
+        margin-top: 0rem !important;
+        padding-top: 0rem !important;
+    }
+
+    .stFileUploader label {
+        margin-top: 0rem !important;
+        padding-top: 0rem !important;
+    }
+
+    [data-testid="stFileUploader"] {
+        margin-top: 0rem !important;
+        padding-top: 0rem !important;
+    }
+
+    [data-testid="stFileUploader"] label {
+        margin-top: 0rem !important;
+        padding-top: 0rem !important;
     }
 
     /* Footer - full width */
@@ -81,19 +102,30 @@ st.markdown("""
     footer {visibility: hidden;}
     .stDeployButton {visibility: hidden;}
 
-    /* Reduce block container padding */
+    /* Minimize block container padding */
     .block-container {
-        padding-top: 1rem !important;
+        padding-top: 0.5rem !important;
         padding-bottom: 4rem !important;
     }
 
+    /* Remove all element margins */
+    .element-container {
+        margin-top: 0rem !important;
+        padding-top: 0rem !important;
+    }
+
+    /* Remove section margins */
+    section {
+        margin-top: 0rem !important;
+        padding-top: 0rem !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# HERO SECTION
+# HERO SECTION - NO EXTRA SPACING
 # -----------------------------------------------------------------------------
-st.markdown('<p class="main-title">🏛️ Sri Lanka Landmark Recognition</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-title">📍 Sri Lanka Landmark Recognition</p>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Discover the beauty of Sri Lanka with AI-powered image recognition</p>',
             unsafe_allow_html=True)
 
@@ -110,7 +142,7 @@ except Exception as e:
     st.stop()
 
 # -----------------------------------------------------------------------------
-# MAIN CONTENT
+# MAIN CONTENT - NO PADDING
 # -----------------------------------------------------------------------------
 st.markdown('<div class="upload-section">', unsafe_allow_html=True)
 
@@ -158,8 +190,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 # -----------------------------------------------------------------------------
 st.markdown("""
 <div class="footer">
-    <p style="margin: 0;">🇱🇰 <strong>AI-Powered Intelligent Tourism Support System</strong></p>
-    <p style="margin: 0.3rem 0 0 0; font-size: 0.75rem; opacity: 0.7;">Built with TensorFlow • Streamlit • EfficientNetB0</p>
+    <p style="margin: 0;">🇱🇰 AI-Powered Intelligent Tourism Support System</p>
     <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; opacity: 0.5;">© 2026</p>
 </div>
 """, unsafe_allow_html=True)
