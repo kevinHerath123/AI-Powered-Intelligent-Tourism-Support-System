@@ -26,7 +26,7 @@ st.markdown("""
 
     /* Main title - visible at top, larger font */
     .main-title {
-        font-size: 22rem;
+        font-size: 40rem;
         font-weight: bold;
         text-align: center;
         color: #ffffff;
@@ -38,7 +38,7 @@ st.markdown("""
     .subtitle {
         text-align: center;
         color: #c8c8c8;
-        font-size: 20rem;
+        font-size: 38rem;
         margin: 0rem 0 2.5rem 0 !important;
         padding: 0 !important;
         
