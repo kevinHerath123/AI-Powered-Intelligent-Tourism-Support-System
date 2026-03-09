@@ -9,7 +9,7 @@ from classifier import get_prediction
 
 # Page config
 st.set_page_config(
-    page_title=" Sri Lanka Landmark Recognition",
+    page_title="Sri Lanka Landmark Recognition",
     page_icon="🏛️",
     layout="centered",
     initial_sidebar_state="collapsed"
@@ -26,20 +26,20 @@ st.markdown("""
 
     /* Main title - visible at top, larger font */
     .main-title {
-        font-size: 3.5rem;
+        font-size: 7rem;
         font-weight: bold;
         text-align: center;
         color: #ffffff;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        margin: 8rem 0 0.3rem 0 !important;
+        margin: 5rem 0 0.3rem 0 !important;
     }
 
     /* Subtitle - larger font */
     .subtitle {
         text-align: center;
         color: #c8c8c8;
-        font-size: 2.5rem;
-        margin: 0rem 0 3rem 0 !important;
+        font-size: 5rem;
+        margin: 0rem 0 2.5rem 0 !important;
         padding: 0 !important;
         
     }
@@ -91,7 +91,7 @@ st.markdown("""
         width: 100vw;
         text-align: center;
         color: #666666;
-        font-size: 0.85rem;
+        font-size: 1rem;
         padding: 1rem;
         border-top: 1px solid rgba(255,255,255,0.08);
         background: rgba(10, 10, 15, 0.95);
@@ -192,6 +192,6 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown("""
 <div class="footer">
     <p style="margin: 0;">🇱🇰 AI-Powered Intelligent Tourism Support System</p>
-    <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; opacity: 0.5;">© 2026</p>
+    <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; opacity: 1.2;">© 2026</p>
 </div>
 """, unsafe_allow_html=True)
