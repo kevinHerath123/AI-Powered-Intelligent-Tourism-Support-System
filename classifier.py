@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Landmark Classifier App - For Streamlit Cloud Deployment"""
 import os
-
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import tensorflow as tf
@@ -20,32 +19,31 @@ CLASS_NAMES_PATH = 'class_names.json'
 # LOCATION MAPPING
 # -----------------------------------------------------------------------------
 LOCATION_MAP = {
-    "Adam's Peak ": "Rathnapura, Sabaragamuwa Province, Sri Lanka ",
-    "Ancient City of Polonnaruwa ": "Polonnaruwa, North Central Province, Sri Lanka ",
-    "Beruwala Light House ": "Beruwala, Western Province, Sri Lanka ",
-    "British War Cemetery ": "Kandy, Central Province, Sri Lanka ",
-    "Bundala National Park ": "Hambantota, Southern Province, Sri Lanka ",
-    "Delft Island ": "Jaffna, Northern Province, Sri Lanka ",
-    "Dowa Rock Temple ": "Bandarawela, Uva Province, Sri Lanka ",
-    "Ganagaramaya Temple ": "Colombo, Western Province, Sri Lanka ",
-    "Henarathgoda Botanical Gard ": "Gampaha, Western Province, Sri Lanka ",
-    "Hortains Plain ": "Nuwara Eliya, Central Province, Sri Lanka ",
-    "Independance Square ": "Colombo, Western Province, Sri Lanka ",
-    "Jaya Sri Maha Bodhi ": "Anuradhapura, North Central Province, Sri Lanka ",
-    "Lotus Tower ": "Colombo, Western Province, Sri Lanka ",
-    "Maligawa Buddha Statue ": "Kandy, Central Province, Sri Lanka ",
-    "Nine Arches Bridge ": "Ella, Uva Province, Sri Lanka ",
-    "Pinnawala Elephant Orphanage ": "Kegalle, Sabaragamuwa Province, Sri Lanka ",
-    "Sigiriya ": "Matale, Central Province, Sri Lanka ",
-    "Sinharaja Forest ": "Ratnapura, Sabaragamuwa Province, Sri Lanka ",
-    "Sri Dalada Maligawa ": "Kandy, Central Province, Sri Lanka ",
-    "Star Fort ": "Matara, Southern Province, Sri Lanka ",
-    "Turtle Hatchery ": "Kosgoda, Southern Province, Sri Lanka ",
-    "Vavuniya Archaeological Museum ": "Vavuniya, Northern Province, Sri Lanka ",
-    "Wilapattu National Park ": "Puttalam, North Western Province, Sri Lanka ",
-    "Yapahuwa Rock Fortress ": "Yapahuwa, North Western Province, Sri Lanka ",
+    "Adam's Peak  ":  "Rathnapura, Sabaragamuwa Province, Sri Lanka  ",
+    "Ancient City of Polonnaruwa  ":  "Polonnaruwa, North Central Province, Sri Lanka  ",
+    "Beruwala Light House  ":  "Beruwala, Western Province, Sri Lanka  ",
+    "British War Cemetery  ":  "Kandy, Central Province, Sri Lanka  ",
+    "Bundala National Park  ":  "Hambantota, Southern Province, Sri Lanka  ",
+    "Delft Island  ":  "Jaffna, Northern Province, Sri Lanka  ",
+    "Dowa Rock Temple  ":  "Bandarawela, Uva Province, Sri Lanka  ",
+    "Ganagaramaya Temple  ":  "Colombo, Western Province, Sri Lanka  ",
+    "Henarathgoda Botanical Gard  ":  "Gampaha, Western Province, Sri Lanka  ",
+    "Hortains Plain  ":  "Nuwara Eliya, Central Province, Sri Lanka  ",
+    "Independance Square  ":  "Colombo, Western Province, Sri Lanka  ",
+    "Jaya Sri Maha Bodhi  ":  "Anuradhapura, North Central Province, Sri Lanka  ",
+    "Lotus Tower  ":  "Colombo, Western Province, Sri Lanka  ",
+    "Maligawa Buddha Statue  ":  "Kandy, Central Province, Sri Lanka  ",
+    "Nine Arches Bridge  ":  "Ella, Uva Province, Sri Lanka  ",
+    "Pinnawala Elephant Orphanage  ":  "Kegalle, Sabaragamuwa Province, Sri Lanka  ",
+    "Sigiriya  ":  "Matale, Central Province, Sri Lanka  ",
+    "Sinharaja Forest  ":  "Ratnapura, Sabaragamuwa Province, Sri Lanka  ",
+    "Sri Dalada Maligawa  ":  "Kandy, Central Province, Sri Lanka  ",
+    "Star Fort  ":  "Matara, Southern Province, Sri Lanka  ",
+    "Turtle Hatchery  ":  "Kosgoda, Southern Province, Sri Lanka  ",
+    "Vavuniya Archaeological Museum  ":  "Vavuniya, Northern Province, Sri Lanka  ",
+    "Wilapattu National Park  ":  "Puttalam, North Western Province, Sri Lanka  ",
+    "Yapahuwa Rock Fortress  ":  "Yapahuwa, North Western Province, Sri Lanka  ",
 }
-
 
 # -----------------------------------------------------------------------------
 # CLASSIFIER CLASS
@@ -85,7 +83,7 @@ class LandmarkClassifier:
         pred_idx = np.argmax(predictions[0])
         landmark_name = self.class_names[pred_idx]
 
-        # ✅ KEY FIX: Strip whitespace before lookup
+        # ✅ Strip whitespace before lookup (fixes "Unknown Location" issue)
         location = LOCATION_MAP.get(landmark_name.strip(), "Unknown Location")
 
         return {
@@ -93,20 +91,20 @@ class LandmarkClassifier:
             'place': location
         }
 
-
 # -----------------------------------------------------------------------------
 # INITIALIZATION
 # -----------------------------------------------------------------------------
 classifier = None
 
-
 def init_classifier(model_path=MODEL_PATH, classes_path=CLASS_NAMES_PATH):
+    """Initialize the classifier manually"""
     global classifier
     classifier = LandmarkClassifier(model_path, classes_path)
     return classifier
 
-
 def get_prediction(image_input):
+    """Get prediction - with lazy initialization"""
+    global classifier
     if classifier is None:
-        raise RuntimeError("Classifier not initialized. Call init_classifier() first.")
+        classifier = LandmarkClassifier()  # Auto-init if needed
     return classifier.predict(image_input)
