@@ -17,7 +17,6 @@ st.set_page_config(
 # Custom CSS for styling
 st.markdown("""
 <style>
-    /* Darker gradient background */
     .stApp {
         background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%);
         min-height: 100vh;
@@ -38,7 +37,7 @@ st.markdown("""
     .subtitle {
         text-align: center;
         color: #c8c8c8;
-        font-size: 2.5rem;  
+        font-size: 5.5rem;  
         margin: 0rem 0 2.5rem 0 !important;
         padding: 0 !important;
     }
@@ -153,9 +152,9 @@ uploaded_file = st.file_uploader(
 
 if uploaded_file:
     image = Image.open(uploaded_file)
-    st.image(image, caption="📷 Your Upload", use_column_width=True)
+    st.image(image, caption="📷 Loaded Image", use_column_width=True)
 
-    with st.spinner("🔍 Analyzing picture..."):
+    with st.spinner("🔍 Analyzing the image..."):
         result = get_prediction(image)
 
     st.markdown(f"""
@@ -170,7 +169,7 @@ else:
     st.markdown("""
     <div style="text-align: center; padding: 1rem; color: #b8b8b8;">
         <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📸</div>
-        <p style="margin: 0.5rem 0; font-size: 1rem;">Ready to Explore?</p>
+        <p style="margin: 0.5rem 0; font-size: 1.2rem;">Ready to Explore?</p>
         <p style="margin: 0.5rem 0; font-size: 1.1rem;">Upload a photo of a Sri Lankan landmark above to get started!</p>
         <p style="font-size: 0.9rem; color: #FCFAFA; margin: 0.5rem 0;">
             💡 Tip: Clear, well-lit photos work best
@@ -185,7 +184,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 # -----------------------------------------------------------------------------
 st.markdown("""
 <div class="footer">
-    <p style="margin: 0; color: #ffffff">AI-Powered Intelligent Tourism Support System</p>
-    <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; color: #ffffff">© 2026</p>
+    <p style="margin: 0; color: #ffffff; opacity: 0.5">AI-Powered Intelligent Tourism Support System</p>
+    <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; color: #ffffff"; opacity: 0.5">© 2026</p>
 </div>
 """, unsafe_allow_html=True)
