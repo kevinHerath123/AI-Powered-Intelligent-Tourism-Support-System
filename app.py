@@ -18,22 +18,20 @@ st.set_page_config(
 st.markdown("""
 <style>
     .stApp {
-        background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%);
+        background: linear-gradient(135deg, #0a1a1a 0%, #1a3d3d 50%, #0a2a2a 100%);
         min-height: 100vh;
     }
 
-    /* Main title - CORRECTED FONT SIZE */
     .main-title {
         font-size: 1.5rem;  
         font-weight: bold;
         text-align: center;
         color: #ffffff;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        margin: 5rem 0 0.3rem 0 !important;
+        margin: 5rem 0 0.6rem 0 !important;
         padding: 0 !important;
     }
 
-    /* Subtitle - CORRECTED FONT SIZE */
     .subtitle {
         text-align: center;
         color: #ede4e4;
@@ -184,7 +182,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 # -----------------------------------------------------------------------------
 st.markdown("""
 <div class="footer">
-    <p style="margin: 0; color: #ffffff; opacity: 0.4">AI-Powered Intelligent Tourism Support System</p>
+    <p style="margin: 0; color: #ffffff; opacity: 0.1">AI-Powered Intelligent Tourism Support System</p>
     <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; color: #ffffff; opacity: 0.4">© 2026</p>
 </div>
 """, unsafe_allow_html=True)
