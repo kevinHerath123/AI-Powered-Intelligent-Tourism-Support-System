@@ -53,7 +53,7 @@ st.markdown("""
     .upload-section {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 15px;
-        padding: 2rem 1.5rem !important;  
+        padding: 0rem !important;  
         backdrop-filter: blur(10px);
         margin: 1rem 0 !important;  
         transition: all 0.3s ease-in-out;
