@@ -37,7 +37,7 @@ st.markdown("""
     .subtitle {
         text-align: center;
         color: #c8c8c8;
-        font-size: 5.5rem;  
+        font-size: 0.5rem;  
         margin: 0rem 0 2.5rem 0 !important;
         padding: 0 !important;
     }
@@ -125,7 +125,7 @@ st.markdown("""
 # HERO SECTION - NO EXTRA SPACING
 # -----------------------------------------------------------------------------
 st.markdown('<h2 class="main-title">🏛️ Sri Lanka Landmark Recognition</h2>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Discover the beauty of Sri Lanka with AI-powered image recognition</p>',
+st.markdown('<h3 class="subtitle">Discover the beauty of Sri Lanka with AI-powered image recognition</h3>',
             unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
@@ -184,7 +184,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 # -----------------------------------------------------------------------------
 st.markdown("""
 <div class="footer">
-    <p style="margin: 0; color: #ffffff; opacity: 0.5">AI-Powered Intelligent Tourism Support System</p>
-    <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; color: #ffffff"; opacity: 0.5">© 2026</p>
+    <p style="margin: 0; color: #ffffff; opacity: 0.4">AI-Powered Intelligent Tourism Support System</p>
+    <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; color: #ffffff; opacity: 0.4">© 2026</p>
 </div>
 """, unsafe_allow_html=True)
