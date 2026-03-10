@@ -38,7 +38,7 @@ st.markdown("""
     .subtitle {
         text-align: center;
         color: #c8c8c8;
-        font-size: 0.5rem;  
+        font-size: 2.5rem;  
         margin: 0rem 0 2.5rem 0 !important;
         padding: 0 !important;
     }
@@ -126,7 +126,7 @@ st.markdown("""
 # HERO SECTION - NO EXTRA SPACING
 # -----------------------------------------------------------------------------
 st.markdown('<h2 class="main-title">🏛️ Sri Lanka Landmark Recognition</h2>', unsafe_allow_html=True)
-st.markdown('<h2 class="subtitle">Discover the beauty of Sri Lanka with AI-powered image recognition</h2>',
+st.markdown('<p class="subtitle">Discover the beauty of Sri Lanka with AI-powered image recognition</p>',
             unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
@@ -170,7 +170,7 @@ else:
     st.markdown("""
     <div style="text-align: center; padding: 1rem; color: #b8b8b8;">
         <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📸</div>
-        <p style="margin: 0.5rem 0; font-size: 2rem;">Ready to Explore?</p>
+        <p style="margin: 0.5rem 0; font-size: 1rem;">Ready to Explore?</p>
         <p style="margin: 0.5rem 0; font-size: 1.1rem;">Upload a photo of a Sri Lankan landmark above to get started!</p>
         <p style="font-size: 0.9rem; color: #FCFAFA; margin: 0.5rem 0;">
             💡 Tip: Clear, well-lit photos work best
