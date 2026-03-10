@@ -25,7 +25,7 @@ st.markdown("""
 
     /* Main title - CORRECTED FONT SIZE */
     .main-title {
-        font-size: 8.0rem;  
+        font-size: 11.0rem;  
         font-weight: bold;
         text-align: center;
         color: #ffffff;
@@ -38,7 +38,7 @@ st.markdown("""
     .subtitle {
         text-align: center;
         color: #c8c8c8;
-        font-size: 7.5rem;  
+        font-size: 10.5rem;  
         margin: 0rem 0 2.5rem 0 !important;
         padding: 0 !important;
     }
@@ -185,7 +185,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 # -----------------------------------------------------------------------------
 st.markdown("""
 <div class="footer">
-    <p style="margin: 0;">🇱 AI-Powered Intelligent Tourism Support System</p>
+    <p style="margin: 0; color: #ffffff">🇱 AI-Powered Intelligent Tourism Support System</p>
     <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; color: #ffffff">© 2026</p>
 </div>
 """, unsafe_allow_html=True)
