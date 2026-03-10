@@ -50,12 +50,21 @@ st.markdown("""
         box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
     }
 
-    /* Upload section - NO PADDING */
     .upload-section {
         background: rgba(255, 255, 255, 0.05);
-        border-radius: 12px;
-        padding: 0 !important;
-        margin: 0.5rem 0 !important;
+        border-radius: 15px;
+        padding: 2rem 1.5rem !important;  
+        backdrop-filter: blur(10px);
+        margin: 1rem 0 !important;  
+        transition: all 0.3s ease-in-out;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .upload-section:hover {
+        background: rgba(255, 255, 255, 0.12);  /* ✅ Lighter on hover (from 0.05 to 0.12) */
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
     }
 
     /* Remove ALL padding/margin from uploader */
@@ -182,7 +191,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 # -----------------------------------------------------------------------------
 st.markdown("""
 <div class="footer">
-    <p style="margin: 0; color: #ffffff; opacity: 0.1">AI-Powered Intelligent Tourism Support System</p>
-    <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; color: #ffffff; opacity: 0.4">© 2026</p>
+    <p style="margin: 0; color: #ffffff; opacity: 0.8">AI-Powered Intelligent Tourism Support System</p>
+    <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; color: #ffffff; opacity: 0.8">© 2026</p>
 </div>
 """, unsafe_allow_html=True)
