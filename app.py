@@ -25,12 +25,12 @@ st.markdown("""
 
     /* Main title - CORRECTED FONT SIZE */
     .main-title {
-        font-size: 5.0rem;  
+        font-size: 8.0rem;  
         font-weight: bold;
         text-align: center;
         color: #ffffff;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        margin: 0.5rem 0 0.3rem 0 !important;
+        margin: 5rem 0 0.3rem 0 !important;
         padding: 0 !important;
     }
 
@@ -38,8 +38,8 @@ st.markdown("""
     .subtitle {
         text-align: center;
         color: #c8c8c8;
-        font-size: 4.5rem;  
-        margin: 0rem 0 1rem 0 !important;
+        font-size: 7.5rem;  
+        margin: 0rem 0 2.5rem 0 !important;
         padding: 0 !important;
     }
 
