@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import streamlit as st
@@ -24,24 +23,24 @@ st.markdown("""
         min-height: 100vh;
     }
 
-    /* Main title - visible at top, larger font */
+    /* Main title - CORRECTED FONT SIZE */
     .main-title {
-        font-size: 40rem;
+        font-size: 5.0rem;  
         font-weight: bold;
         text-align: center;
         color: #ffffff;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        margin: 5rem 0 0.3rem 0 !important;
+        margin: 0.5rem 0 0.3rem 0 !important;
+        padding: 0 !important;
     }
 
-    /* Subtitle - larger font */
+    /* Subtitle - CORRECTED FONT SIZE */
     .subtitle {
         text-align: center;
         color: #c8c8c8;
-        font-size: 38rem;
-        margin: 0rem 0 2.5rem 0 !important;
+        font-size: 4.5rem;  
+        margin: 0rem 0 1rem 0 !important;
         padding: 0 !important;
-        
     }
 
     /* Result card */
@@ -135,7 +134,6 @@ st.markdown('<p class="subtitle">Discover the beauty of Sri Lanka with AI-powere
 # -----------------------------------------------------------------------------
 try:
     from classifier import init_classifier
-
     init_classifier()
     st.sidebar.success("✅ Model Ready")
 except Exception as e:
@@ -154,15 +152,12 @@ uploaded_file = st.file_uploader(
 )
 
 if uploaded_file:
-    # Display image
     image = Image.open(uploaded_file)
     st.image(image, caption="📷 Your Upload", use_column_width=True)
 
-    # Predict
     with st.spinner("🔍 Analyzing picture..."):
         result = get_prediction(image)
 
-    # Results card
     st.markdown(f"""
     <div class="result-card">
         <h3 style="margin-top: 0;">✨ Prediction Result</h3>
@@ -172,7 +167,6 @@ if uploaded_file:
     """, unsafe_allow_html=True)
 
 else:
-    # Placeholder
     st.markdown("""
     <div style="text-align: center; padding: 1rem; color: #b8b8b8;">
         <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📸</div>
@@ -191,7 +185,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 # -----------------------------------------------------------------------------
 st.markdown("""
 <div class="footer">
-    <p style="margin: 0;">🇱🇰 AI-Powered Intelligent Tourism Support System</p>
-    <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; opacity: 0.2;">© 2026</p>
+    <p style="margin: 0;">🇱 AI-Powered Intelligent Tourism Support System</p>
+    <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; color: #ffffff">© 2026</p>
 </div>
 """, unsafe_allow_html=True)
