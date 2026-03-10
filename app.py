@@ -25,7 +25,7 @@ st.markdown("""
 
     /* Main title - CORRECTED FONT SIZE */
     .main-title {
-        font-size: 11.0rem;  
+        font-size: 5.0rem;  
         font-weight: bold;
         text-align: center;
         color: #ffffff;
@@ -38,7 +38,7 @@ st.markdown("""
     .subtitle {
         text-align: center;
         color: #c8c8c8;
-        font-size: 10.5rem;  
+        font-size: 4.5rem;  
         margin: 0rem 0 2.5rem 0 !important;
         padding: 0 !important;
     }
@@ -125,8 +125,8 @@ st.markdown("""
 # -----------------------------------------------------------------------------
 # HERO SECTION - NO EXTRA SPACING
 # -----------------------------------------------------------------------------
-st.markdown('<p class="main-title">🏛️ Sri Lanka Landmark Recognition</p>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Discover the beauty of Sri Lanka with AI-powered image recognition</p>',
+st.markdown('<h1 class="main-title">🏛️ Sri Lanka Landmark Recognition</h1>', unsafe_allow_html=True)
+st.markdown('<h2 class="subtitle">Discover the beauty of Sri Lanka with AI-powered image recognition</h2>',
             unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
@@ -170,7 +170,7 @@ else:
     st.markdown("""
     <div style="text-align: center; padding: 1rem; color: #b8b8b8;">
         <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📸</div>
-        <h3 style="margin: 0.5rem 0; font-size: 1.5rem;">Ready to Explore?</h3>
+        <p style="margin: 0.5rem 0; font-size: 2rem;">Ready to Explore?</p>
         <p style="margin: 0.5rem 0; font-size: 1.1rem;">Upload a photo of a Sri Lankan landmark above to get started!</p>
         <p style="font-size: 0.9rem; color: #FCFAFA; margin: 0.5rem 0;">
             💡 Tip: Clear, well-lit photos work best
@@ -185,7 +185,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 # -----------------------------------------------------------------------------
 st.markdown("""
 <div class="footer">
-    <p style="margin: 0; color: #ffffff">🇱 AI-Powered Intelligent Tourism Support System</p>
+    <p style="margin: 0; color: #ffffff">AI-Powered Intelligent Tourism Support System</p>
     <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; color: #ffffff">© 2026</p>
 </div>
 """, unsafe_allow_html=True)
