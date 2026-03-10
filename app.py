@@ -25,7 +25,7 @@ st.markdown("""
 
     /* Main title - CORRECTED FONT SIZE */
     .main-title {
-        font-size: 3.0rem;  
+        font-size: 1.5rem;  
         font-weight: bold;
         text-align: center;
         color: #ffffff;
@@ -38,7 +38,7 @@ st.markdown("""
     .subtitle {
         text-align: center;
         color: #c8c8c8;
-        font-size: 1.5rem;  
+        font-size: 0.5rem;  
         margin: 0rem 0 2.5rem 0 !important;
         padding: 0 !important;
     }
@@ -125,7 +125,7 @@ st.markdown("""
 # -----------------------------------------------------------------------------
 # HERO SECTION - NO EXTRA SPACING
 # -----------------------------------------------------------------------------
-st.markdown('<h1 class="main-title">🏛️ Sri Lanka Landmark Recognition</h1>', unsafe_allow_html=True)
+st.markdown('<h2 class="main-title">🏛️ Sri Lanka Landmark Recognition</h2>', unsafe_allow_html=True)
 st.markdown('<h2 class="subtitle">Discover the beauty of Sri Lanka with AI-powered image recognition</h2>',
             unsafe_allow_html=True)
 
