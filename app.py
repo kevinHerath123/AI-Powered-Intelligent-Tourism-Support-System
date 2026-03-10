@@ -25,7 +25,7 @@ st.markdown("""
 
     /* Main title - CORRECTED FONT SIZE */
     .main-title {
-        font-size: 5.0rem;  
+        font-size: 3.0rem;  
         font-weight: bold;
         text-align: center;
         color: #ffffff;
@@ -38,7 +38,7 @@ st.markdown("""
     .subtitle {
         text-align: center;
         color: #c8c8c8;
-        font-size: 4.5rem;  
+        font-size: 1.5rem;  
         margin: 0rem 0 2.5rem 0 !important;
         padding: 0 !important;
     }
