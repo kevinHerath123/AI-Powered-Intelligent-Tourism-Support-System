@@ -77,22 +77,22 @@ st.markdown("""
     .stFileUploader label {
         margin-top: 0.5rem !important;
         margin-bottom: 0.5rem !important;
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
+        padding-top: 0.5rem important;
+        padding-bottom: 0.5rem important;
     }
 
     [data-testid="stFileUploader"] {
         margin-top: 0.5rem !important;
         margin-bottom: 0.5rem !important;
-        padding-top: 0.5rem !important;
-        padding-bottom: 0.5rem !important;
+        padding-top: 0.5rem important;
+        padding-bottom: 0.5rem important;
     }
 
     [data-testid="stFileUploader"] label {
         margin-top: 0.5rem !important;
         margin-bottom: 0.5rem !important;
-        padding-top: 0.5rem !important;
-        padding-bottom: 0.5rem !important;
+        padding-top: 0.5rem important;
+        padding-bottom: 0.5rem important;
     }
 
     /* Footer - full width */
