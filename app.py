@@ -62,27 +62,24 @@ st.markdown("""
     .stFileUploader {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 12px;
-        padding: 1.5rem 1rem !important;  /* ✅ Symmetrical: top/bottom 1.5rem, left/right 1rem */
+        padding: 1.5rem 1rem !important;  
         margin: 0.5rem 0 !important;
         border: 1px solid rgba(255, 255, 255, 0.1);
         transition: all 0.3s ease-in-out;
     }
 
-
     .stFileUploader:hover {
-        background: rgba(255, 255, 255, 0.12);  /* ✅ Lighter on hover (5% → 12%) */
+        background: rgba(255, 255, 255, 0.12);  
         border: 1px solid rgba(255, 255, 255, 0.25);
         box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
     }
 
-
     .stFileUploader label {
         margin-top: 0.5rem !important;
         margin-bottom: 0.5rem !important;
-        padding-top: 0.5rem !important;
-        padding-bottom: 0.5rem !important;
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
     }
-
 
     [data-testid="stFileUploader"] {
         margin-top: 0.5rem !important;
