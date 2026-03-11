@@ -17,104 +17,82 @@ st.set_page_config(
 # Custom CSS for styling
 st.markdown("""
 <style>
-    /* Darker gradient background */
     .stApp {
-        background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%);
+        background: linear-gradient(135deg, #0a1a1a 0%, #1a3d3d 50%, #0a2a2a 100%);
         min-height: 100vh;
     }
 
-    /* Main title - larger font */
     .main-title {
-        font-size: 3.5rem;
+        font-size: 1.5rem;  
         font-weight: bold;
         text-align: center;
         color: #ffffff;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        margin: 0.5rem 0 0.5rem 0 !important;
+        margin: 5rem 0 0.6rem 0 !important;
         padding: 0 !important;
     }
 
-    /* Subtitle - larger font */
     .subtitle {
         text-align: center;
-        color: #c8c8c8;
-        font-size: 1.5rem;
-        margin: 0 0 1.5rem 0 !important;
+        color: #ede4e4;
+        font-size: 0rem;  
+        margin: 0rem 0 2.5rem 0 !important;
         padding: 0 !important;
     }
 
     /* Result card */
     .result-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 15px;
+        border-radius: 13px;
         padding: 1.5rem;
         color: white;
         margin: 1.5rem 0;
         box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
     }
 
-    /* Upload section - with HOVER EFFECT */
     .upload-section {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 15px;
-        padding: 2rem 1.5rem !important;
+        padding: 0rem !important;  
         backdrop-filter: blur(10px);
-        margin: 1rem 0 !important;
-        transition: all 0.3s ease-in-out;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin: 1rem 0 !important; 
     }
-
-    /* Hover effect - becomes lighter */
-    .upload-section:hover {
-        background: rgba(255, 255, 255, 0.12);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 8px 32px rgba(255, 255, 255, 0.1);
-        transform: translateY(-2px);
-    }
-
-    /* Center the file uploader content */
+    
+    /* Remove ALL padding/margin from uploader */
     .stFileUploader {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 12px;
-        padding: 1.5rem 1rem !important;
+        padding: 1.5rem 1rem !important;  
         margin: 0.5rem 0 !important;
         border: 1px solid rgba(255, 255, 255, 0.1);
         transition: all 0.3s ease-in-out;
-        text-align: center !important;
     }
 
-    /* Center content inside uploader */
-    .stFileUploader > div {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-
-    /* Center the label */
-    .stFileUploader label {
-        text-align: center !important;
-        margin: 0 auto !important;
-        display: block !important;
-    }
-
-    /* Center the upload box */
-    [data-testid="stFileUploader"] {
-        text-align: center !important;
-    }
-
-    [data-testid="stFileUploader"] > div {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-
-    /* Hover effect */
     .stFileUploader:hover {
-        background: rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.12);  
         border: 1px solid rgba(255, 255, 255, 0.25);
         box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+    }
+
+    .stFileUploader label {
+        margin-top: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+        padding-top: 0.5rem important;
+        padding-bottom: 0.5rem important;
+    }
+
+    [data-testid="stFileUploader"] {
+        margin-top: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+        padding-top: 0.5rem important;
+        padding-bottom: 0.5rem important;
+    }
+
+    [data-testid="stFileUploader"] label {
+        margin-top: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+        padding-top: 0.5rem important;
+        padding-bottom: 0.5rem important;
     }
 
     /* Footer - full width */
@@ -125,7 +103,7 @@ st.markdown("""
         width: 100vw;
         text-align: center;
         color: #666666;
-        font-size: 0.85rem;
+        font-size: 1rem;
         padding: 1rem;
         border-top: 1px solid rgba(255,255,255,0.08);
         background: rgba(10, 10, 15, 0.95);
@@ -160,8 +138,8 @@ st.markdown("""
 # -----------------------------------------------------------------------------
 # HERO SECTION - NO EXTRA SPACING
 # -----------------------------------------------------------------------------
-st.markdown('<p class="main-title">🏛️ Sri Lanka Landmark Recognition</p>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Discover the beauty of Sri Lanka with AI-powered image recognition</p>',
+st.markdown('<h2 class="main-title">🏛️ Sri Lanka Landmark Recognition</h2>', unsafe_allow_html=True)
+st.markdown('<h5 class="subtitle">Discover the beauty of Sri Lanka with AI-powered image recognition</h5>',
             unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
@@ -204,8 +182,8 @@ if uploaded_file:
 else:
     st.markdown("""
     <div style="text-align: center; padding: 1rem; color: #b8b8b8;">
-        <div style="font-size: 3rem; margin-bottom: 0.5rem;">📸</div>
-        <h3 style="margin: 0.5rem 0; font-size: 1.5rem;">Ready to Explore?</h3>
+        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📸</div>
+        <p style="margin: 0.5rem 0; font-size: 1.2rem;">Ready to Explore?</p>
         <p style="margin: 0.5rem 0; font-size: 1.1rem;">Upload a photo of a Sri Lankan landmark above to get started!</p>
         <p style="font-size: 0.9rem; color: #FCFAFA; margin: 0.5rem 0;">
             💡 Tip: Clear, well-lit photos work best
@@ -220,7 +198,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 # -----------------------------------------------------------------------------
 st.markdown("""
 <div class="footer">
-    <p style="margin: 0;">🇱🇰 AI-Powered Intelligent Tourism Support System</p>
-    <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; opacity: 0.2;">© 2026</p>
+    <p style="margin: 0; color: #ffffff; opacity: 0.8">AI-Powered Intelligent Tourism Support System</p>
+    <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; color: #ffffff; opacity: 0.8">© 2026</p>
 </div>
 """, unsafe_allow_html=True)
