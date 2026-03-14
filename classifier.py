@@ -91,7 +91,13 @@ class LandmarkClassifier:
         if not os.path.exists(self.classes_path):
             raise FileNotFoundError(f"Class names file not found at {self.classes_path}")
 
-        self.model = tf.keras.models.load_model(self.model_path, safe_mode=False)
+        # ✅ Add compile=False to avoid optimizer issues
+        self.model = tf.keras.models.load_model(
+            self.model_path,
+            safe_mode=False,
+            compile=False  # ✅ Don't compile on load (avoids optimizer issues)
+        )
+
         with open(self.classes_path, 'r') as f:
             self.class_names = json.load(f)
 
