@@ -8,12 +8,23 @@ import cv2
 import numpy as np
 from PIL import Image
 import json
+import easyocr
 
 # -----------------------------------------------------------------------------
 # CONFIGURATION
 # -----------------------------------------------------------------------------
 MODEL_PATH = 'FineTuned01-EfficientNetB0_CNN_Model.h5'
 CLASS_NAMES_PATH = 'class_names.json'
+CONFIDENCE_THRESHOLD = 0.75
+
+# -----------------------------------------------------------------------------
+# INITIALIZE OCR READER & FACE DETECTOR
+# -----------------------------------------------------------------------------
+# Initialize OCR Reader (only load once)
+ocr_reader = easyocr.Reader(['en'], gpu=False, verbose=False)
+
+# Initialize Human Face Detector (OpenCV Haar Cascade)
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
 # -----------------------------------------------------------------------------
 # LOCATION MAPPING
@@ -46,6 +57,24 @@ LOCATION_MAP = {
 }
 
 # -----------------------------------------------------------------------------
+# HELPER FUNCTIONS
+# -----------------------------------------------------------------------------
+def detect_humans(img_path):
+    """Returns True if human faces are detected."""
+    try:
+        img_cv = cv2.imread(img_path)
+        if img_cv is None:
+            # Try loading from PIL if cv2.imread fails
+            img_pil = Image.open(img_path).convert('RGB')
+            img_cv = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+
+        gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+        faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+        return len(faces) > 0
+    except Exception:
+        return False
+
+# -----------------------------------------------------------------------------
 # CLASSIFIER CLASS
 # -----------------------------------------------------------------------------
 class LandmarkClassifier:
@@ -67,29 +96,72 @@ class LandmarkClassifier:
             self.class_names = json.load(f)
 
     def predict(self, image_input):
-        if isinstance(image_input, str):
-            img = Image.open(image_input).convert('RGB')
-        elif isinstance(image_input, Image.Image):
-            img = image_input.convert('RGB')
-        else:
-            raise ValueError("Input must be file path or PIL Image")
+        try:
+            # Save image temporarily for face detection and OCR
+            if isinstance(image_input, str):
+                img_path = image_input
+                img = Image.open(img_path).convert('RGB')
+            elif isinstance(image_input, Image.Image):
+                # Save PIL image to temp file
+                import tempfile
+                temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.jpg')
+                image_input.save(temp_file.name)
+                img_path = temp_file.name
+                img = image_input
+            else:
+                raise ValueError("Input must be file path or PIL Image")
 
-        img_array = np.array(img)
-        img_resized = cv2.resize(img_array, (290, 290))
-        img_normalized = img_resized / 255.0
-        img_batch = np.expand_dims(img_normalized, axis=0)
+            # 1. Human Validation (Reject if faces found)
+            if detect_humans(img_path):
+                return None
 
-        predictions = self.model.predict(img_batch, verbose=0)
-        pred_idx = np.argmax(predictions[0])
-        landmark_name = self.class_names[pred_idx]
+            # 2. CNN Prediction
+            img_array = np.array(img)
+            img_resized = cv2.resize(img_array, (290, 290))
+            img_normalized = img_resized / 255.0
+            img_batch = np.expand_dims(img_normalized, axis=0)
 
-        #Strip whitespace before lookup
-        location = LOCATION_MAP.get(landmark_name.strip(), "Unknown Location")
+            probs = self.model.predict(img_batch, verbose=0)[0]
+            pred_idx = np.argmax(probs)
+            confidence = np.max(probs)
 
-        return {
-            'name': landmark_name,
-            'place': location
-        }
+            # 3. Confidence Validation (Reject objects/non-landmarks)
+            if confidence < CONFIDENCE_THRESHOLD:
+                return None
+
+            landmark = self.class_names[pred_idx].strip()
+            location = LOCATION_MAP.get(landmark, "Unknown Location")
+
+            # 4. OCR Verification (Optional text check)
+            try:
+                ocr_results = ocr_reader.readtext(img_path, detail=0)
+                detected_text = " ".join(ocr_results).lower()
+                landmark_keywords = landmark.lower().split()
+
+                # If confidence is moderate, require text match
+                if confidence < 0.90:
+                    match_found = any(keyword in detected_text for keyword in landmark_keywords if len(keyword) > 3)
+                    if not match_found:
+                        return None
+            except Exception:
+                # If OCR fails, still return result if confidence is high
+                if confidence < 0.90:
+                    return None
+
+            # Clean up temp file if created
+            if isinstance(image_input, Image.Image):
+                try:
+                    os.unlink(img_path)
+                except:
+                    pass
+
+            return {
+                'name': landmark,
+                'place': location
+            }
+
+        except Exception as e:
+            return None
 
 # -----------------------------------------------------------------------------
 # INITIALIZATION
@@ -106,5 +178,5 @@ def get_prediction(image_input):
     """Get prediction - with lazy initialization"""
     global classifier
     if classifier is None:
-        classifier = LandmarkClassifier()  # Auto-init if needed
+        classifier = LandmarkClassifier()
     return classifier.predict(image_input)
