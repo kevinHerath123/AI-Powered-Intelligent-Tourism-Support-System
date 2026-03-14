@@ -12,7 +12,7 @@ import json
 # -----------------------------------------------------------------------------
 # CONFIGURATION
 # -----------------------------------------------------------------------------
-MODEL_PATH = 'FineTuned-EfficientNetB0_CNN_Model.h5'
+MODEL_PATH = 'FineTuned01-EfficientNetB0_CNN_Model.h5'
 CLASS_NAMES_PATH = 'class_names.json'
 
 # -----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ class LandmarkClassifier:
         pred_idx = np.argmax(predictions[0])
         landmark_name = self.class_names[pred_idx]
 
-        # ✅ Strip whitespace before lookup (fixes "Unknown Location" issue)
+        #Strip whitespace before lookup
         location = LOCATION_MAP.get(landmark_name.strip(), "Unknown Location")
 
         return {
