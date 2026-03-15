@@ -9,6 +9,7 @@ import numpy as np
 from PIL import Image
 import json
 import easyocr
+import tempfile
 
 # -----------------------------------------------------------------------------
 # CONFIGURATION
@@ -57,6 +58,31 @@ LOCATION_MAP = {
 }
 
 # -----------------------------------------------------------------------------
+# GLOBAL VARIABLES FOR LAZY LOADING
+# -----------------------------------------------------------------------------
+ocr_reader = None
+face_cascade = None
+
+def get_ocr_reader():
+    """Lazy load EasyOCR only when needed"""
+    global ocr_reader
+    if ocr_reader is None:
+        try:
+            import easyocr
+            ocr_reader = easyocr.Reader(['en'], gpu=False, verbose=False)
+        except Exception as e:
+            print(f"OCR Load Error: {e}")
+            return None
+    return ocr_reader
+
+def get_face_cascade():
+    """Lazy load Face Detector"""
+    global face_cascade
+    if face_cascade is None:
+        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+    return face_cascade
+
+# -----------------------------------------------------------------------------
 # HELPER FUNCTIONS
 # -----------------------------------------------------------------------------
 def detect_humans(img_path):
@@ -103,33 +129,28 @@ class LandmarkClassifier:
 
     def predict(self, image_input):
         try:
-            # Save image temporarily for face detection and OCR
+            # Load Image
             if isinstance(image_input, str):
-                img_path = image_input
-                img = Image.open(img_path).convert('RGB')
+                img = Image.open(image_input).convert('RGB')
             elif isinstance(image_input, Image.Image):
-                # Save PIL image to temp file
-                import tempfile
-                temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.jpg')
-                image_input.save(temp_file.name)
-                img_path = temp_file.name
-                img = image_input
+                img = image_input.convert('RGB')
             else:
                 raise ValueError("Input must be file path or PIL Image")
 
+            img_array = np.array(img)
+
             # 1. Human Validation (Reject if faces found)
-            if detect_humans(img_path):
+            if detect_humans(img_array):
                 return None
 
             # 2. CNN Prediction
-            img_array = np.array(img)
             img_resized = cv2.resize(img_array, (290, 290))
             img_normalized = img_resized / 255.0
             img_batch = np.expand_dims(img_normalized, axis=0)
 
             probs = self.model.predict(img_batch, verbose=0)[0]
             pred_idx = np.argmax(probs)
-            confidence = np.max(probs)
+            confidence = float(np.max(probs))
 
             # 3. Confidence Validation (Reject objects/non-landmarks)
             if confidence < CONFIDENCE_THRESHOLD:
@@ -138,36 +159,45 @@ class LandmarkClassifier:
             landmark = self.class_names[pred_idx].strip()
             location = LOCATION_MAP.get(landmark, "Unknown Location")
 
-            # 4. OCR Verification (Optional text check)
-            try:
-                ocr_results = ocr_reader.readtext(img_path, detail=0)
-                detected_text = " ".join(ocr_results).lower()
-                landmark_keywords = landmark.lower().split()
+            # 4. OCR Verification (Only if confidence is moderate)
+            if confidence < 0.90:
+                ocr = get_ocr_reader()
+                if ocr:
+                    try:
+                        # Save temp file for OCR
+                        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.jpg')
+                        img.save(temp_file.name)
 
-                # If confidence is moderate, require text match
-                if confidence < 0.90:
-                    match_found = any(keyword in detected_text for keyword in landmark_keywords if len(keyword) > 3)
-                    if not match_found:
+                        # Read text
+                        ocr_results = ocr.readtext(temp_file.name, detail=0)
+                        detected_text = " ".join(ocr_results).lower()
+
+                        # Cleanup
+                        os.unlink(temp_file.name)
+
+                        # Verify text match
+                        landmark_keywords = landmark.lower().split()
+                        match_found = any(keyword in detected_text for keyword in landmark_keywords if len(keyword) > 3)
+
+                        if not match_found:
+                            return None
+                    except Exception:
+                        # If OCR fails, reject moderate confidence predictions
                         return None
-            except Exception:
-                # If OCR fails, still return result if confidence is high
-                if confidence < 0.90:
+                else:
+                    # If OCR reader failed to load, reject moderate confidence
                     return None
 
-            # Clean up temp file if created
-            if isinstance(image_input, Image.Image):
-                try:
-                    os.unlink(img_path)
-                except:
-                    pass
-
+            # ✅ Only return name and place (NO confidence)
             return {
                 'name': landmark,
                 'place': location
             }
 
         except Exception as e:
+            print(f"Prediction Error: {e}")
             return None
+
 
 # -----------------------------------------------------------------------------
 # INITIALIZATION
