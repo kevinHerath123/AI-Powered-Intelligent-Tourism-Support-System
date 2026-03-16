@@ -16,7 +16,7 @@ import tempfile
 # -----------------------------------------------------------------------------
 MODEL_PATH = 'FineTuned01-EfficientNetB0_CNN_Model.h5'
 CLASS_NAMES_PATH = 'class_names.json'
-CONFIDENCE_THRESHOLD = 0.65  
+CONFIDENCE_THRESHOLD = 0.65
 
 # -----------------------------------------------------------------------------
 # LOCATION MAPPING (Match your CLASS_NAMES exactly - NO trailing spaces)
@@ -44,7 +44,7 @@ LOCATION_MAP = {
     "Star Fort": "Matara, Southern Province, Sri Lanka",
     "Turtle Hatchery": "Kosgoda, Southern Province, Sri Lanka",
     "Vavuniya Archaeological Museum": "Vavuniya, Northern Province, Sri Lanka",
-    "Wilapattu National Park": "Puttalam, North Western Province, Sri Lanka",
+    "Wilpattu National Park": "Puttalam, North Western Province, Sri Lanka",
     "Yapahuwa Rock Fortress": "Yapahuwa, North Western Province, Sri Lanka",
 }
 
@@ -59,7 +59,6 @@ face_cascade = None
 # HELPER FUNCTIONS
 # -----------------------------------------------------------------------------
 def get_ocr_reader():
-    """Lazy load EasyOCR only when needed"""
     global ocr_reader
     if ocr_reader is None:
         try:
@@ -72,7 +71,6 @@ def get_ocr_reader():
 
 
 def get_face_cascade():
-    """Lazy load Face Detector"""
     global face_cascade
     if face_cascade is None:
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -80,7 +78,6 @@ def get_face_cascade():
 
 
 def detect_humans(img_array):
-    """Returns True if human faces are detected"""
     try:
         gray = cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
         faces = get_face_cascade().detectMultiScale(gray, 1.3, 5)
@@ -89,11 +86,9 @@ def detect_humans(img_array):
         return False
 
 
+#  Flexible matching that handles blurry OCR results.Returns True if at least 50% of significant words match.
 def flexible_ocr_match(detected_text, landmark_name):
-    """
-    Flexible matching that handles blurry OCR results.
-    Returns True if at least 50% of significant words match.
-    """
+
     if not detected_text:
         return False
 
@@ -130,7 +125,6 @@ class LandmarkClassifier:
         self._load_model()
 
     def _load_model(self):
-        """Load model and class names"""
         if not os.path.exists(self.model_path):
             raise FileNotFoundError(f"Model file not found at {self.model_path}")
         if not os.path.exists(self.classes_path):
@@ -141,10 +135,6 @@ class LandmarkClassifier:
             self.class_names = json.load(f)
 
     def predict(self, image_input):
-        """
-        Predict landmark from image.
-        Returns: {'name': str, 'place': str} OR None if validation fails
-        """
         try:
             # Load Image
             if isinstance(image_input, str):
