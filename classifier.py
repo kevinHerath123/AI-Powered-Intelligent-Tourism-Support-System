@@ -44,7 +44,7 @@ LOCATION_MAP = {
     "Star Fort": "Matara, Southern Province, Sri Lanka",
     "Turtle Hatchery": "Kosgoda, Southern Province, Sri Lanka",
     "Vavuniya Archaeological Museum": "Vavuniya, Northern Province, Sri Lanka",
-    "Wilapattu National Park": "Puttalam, North Western Province, Sri Lanka",
+    "Wilpattu National Park": "Puttalam, North Western Province, Sri Lanka",
     "Yapahuwa Rock Fortress": "Yapahuwa, North Western Province, Sri Lanka",
 }
 
@@ -54,7 +54,9 @@ LOCATION_MAP = {
 ocr_reader = None
 face_cascade = None
 
-
+# -----------------------------------------------------------------------------
+# HELPER FUNCTIONS
+# -----------------------------------------------------------------------------
 def get_ocr_reader():
     """Lazy load EasyOCR only when needed"""
     global ocr_reader
@@ -76,14 +78,10 @@ def get_face_cascade():
     return face_cascade
 
 
-# -----------------------------------------------------------------------------
-# HELPER FUNCTIONS
-# -----------------------------------------------------------------------------
 def detect_humans(img_array):
-    """Returns True if human faces are detected"""
     try:
         gray = cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
-        faces = get_face_cascade().detectMultiScale(gray, 1.1, 4)
+        faces = get_face_cascade().detectMultiScale(gray, 1.3, 5)
         return len(faces) > 0
     except:
         return False
