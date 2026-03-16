@@ -172,7 +172,7 @@ if uploaded_file:
         result = get_prediction(image)
 
     if result is None:
-        st.error("❌ Could not identify landmark. Please upload a clear photo without people.")
+        st.error("❌ Could not identify landmark. Please upload a clear photo of a landmark.")
     else:
         st.markdown(f"""
         <div class="result-card">
