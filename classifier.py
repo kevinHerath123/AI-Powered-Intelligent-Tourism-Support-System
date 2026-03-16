@@ -146,7 +146,7 @@ class LandmarkClassifier:
 
             img_array = np.array(img)
 
-            # 1. Human Validation (Reject if faces found)
+            # 1. Human Validation
             if detect_humans(img_array):
                 return None
 
@@ -171,44 +171,48 @@ class LandmarkClassifier:
                 ocr = get_ocr_reader()
                 if ocr:
                     try:
-                        # Save temp file for OCR
                         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.jpg')
                         img.save(temp_file.name)
 
-                        # Read text with parameters for better detection
-                        ocr_results = ocr.readtext(temp_file.name, detail=0, min_size=15, contrast_ths=0.05)
+                        # Read text - EasyOCR handles both cases fine
+                        ocr_results = ocr.readtext(temp_file.name, detail=0)
                         detected_text = " ".join(ocr_results).lower()
 
-                        # Cleanup
                         os.unlink(temp_file.name)
 
-                        # More flexible matching - check if ANY significant word matches
-                        landmark_keywords = [word for word in landmark.lower().split() if len(word) > 3]
-                        detected_words = detected_text.split()
+                        # More flexible matching
+                        landmark_lower = landmark.lower()
 
-                        # Check if any landmark keyword appears in detected text
-                        match_found = any(kw in detected_text for kw in landmark_keywords)
+                        # Check if landmark name appears in detected text
+                        if landmark_lower in detected_text:
+                            match_found = True
+                        else:
+                            # Check individual keywords
+                            landmark_keywords = [word for word in landmark_lower.split() if len(word) > 3]
+                            match_found = any(kw in detected_text for kw in landmark_keywords)
 
-                        # Also check partial matches (e.g., "wilpattu" in "wilpattu national park")
+                        # If still no match, try partial matching
                         if not match_found:
+                            detected_words = detected_text.split()
                             for kw in landmark_keywords:
                                 for dw in detected_words:
+                                    # Check if words are similar (one contains the other)
                                     if kw in dw or dw in kw:
                                         match_found = True
                                         break
                                 if match_found:
                                     break
 
+                        # Only reject if confidence is very low AND no OCR match
                         if not match_found and confidence < 0.80:
                             return None
 
                     except Exception as e:
                         print(f"OCR Error: {e}")
-                        # If OCR fails, still accept if confidence is reasonably high
+                        # If OCR fails, accept if confidence is reasonably high
                         if confidence < 0.80:
                             return None
                 else:
-                    # If OCR reader failed to load, accept if confidence is high
                     if confidence < 0.80:
                         return None
 
