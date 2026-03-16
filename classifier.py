@@ -9,7 +9,6 @@ import numpy as np
 from PIL import Image
 import json
 import tempfile
-import easyocr
 
 # -----------------------------------------------------------------------------
 # CONFIGURATION
@@ -19,7 +18,7 @@ CLASS_NAMES_PATH = 'class_names.json'
 CONFIDENCE_THRESHOLD = 0.75
 
 # -----------------------------------------------------------------------------
-# LOCATION MAPPING (Match your CLASS_NAMES exactly)
+# LOCATION MAPPING
 # -----------------------------------------------------------------------------
 LOCATION_MAP = {
     "Adams Peak": "Rathnapura, Sabaragamuwa Province, Sri Lanka",
@@ -54,11 +53,15 @@ LOCATION_MAP = {
 ocr_reader = None
 face_cascade = None
 
+# -----------------------------------------------------------------------------
+# HELPER FUNCTIONS
+# -----------------------------------------------------------------------------
 def get_ocr_reader():
     """Lazy load EasyOCR only when needed"""
     global ocr_reader
     if ocr_reader is None:
         try:
+            import easyocr
             ocr_reader = easyocr.Reader(['en'], gpu=False, verbose=False)
         except Exception as e:
             print(f"OCR Load Error: {e}")
@@ -127,7 +130,7 @@ class LandmarkClassifier:
             pred_idx = np.argmax(probs)
             confidence = float(np.max(probs))
 
-            # 3. Confidence Validation
+            # 3. Confidence Validation (Reject objects/non-landmarks)
             if confidence < CONFIDENCE_THRESHOLD:
                 return None
 
@@ -139,24 +142,42 @@ class LandmarkClassifier:
                 ocr = get_ocr_reader()
                 if ocr:
                     try:
+                        # Save temp file for OCR
                         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.jpg')
                         img.save(temp_file.name)
 
+                        # Read text - OCR returns text as-is (preserves case)
                         ocr_results = ocr.readtext(temp_file.name, detail=0)
-                        detected_text = " ".join(ocr_results).lower()
 
+                        # Cleanup
                         os.unlink(temp_file.name)
 
-                        landmark_keywords = landmark.lower().split()
-                        match_found = any(keyword in detected_text for keyword in landmark_keywords if len(keyword) > 3)
+                        # Convert both OCR text and landmark to lowercase for case-insensitive matching
+                        detected_text = " ".join(ocr_results).lower()
+                        landmark_lower = landmark.lower()
 
-                        if not match_found:
+                        # Check if landmark name (or significant parts) appear in detected text
+                        # This handles both uppercase and lowercase text
+                        landmark_keywords = [word for word in landmark_lower.split() if len(word) > 3]
+
+                        # Count how many keywords match
+                        matches = sum(1 for keyword in landmark_keywords if keyword in detected_text)
+
+                        # If at least one significant keyword matches, accept it
+                        if matches == 0 and landmark_keywords:
                             return None
-                    except Exception:
-                        return None
-                else:
-                    return None
 
+                    except Exception as e:
+                        print(f"OCR Error: {e}")
+                        # If OCR fails, still accept if confidence is reasonably high
+                        if confidence < 0.85:
+                            return None
+                else:
+                    # If OCR reader failed to load, accept if confidence is high
+                    if confidence < 0.85:
+                        return None
+
+            # Only return name and place (NO confidence)
             return {
                 'name': landmark,
                 'place': location
@@ -166,17 +187,20 @@ class LandmarkClassifier:
             print(f"Prediction Error: {e}")
             return None
 
+
 # -----------------------------------------------------------------------------
 # INITIALIZATION
 # -----------------------------------------------------------------------------
 classifier = None
 
 def init_classifier(model_path=MODEL_PATH, classes_path=CLASS_NAMES_PATH):
+    """Initialize the classifier manually"""
     global classifier
     classifier = LandmarkClassifier(model_path, classes_path)
     return classifier
 
 def get_prediction(image_input):
+    """Get prediction - with lazy initialization"""
     global classifier
     if classifier is None:
         classifier = LandmarkClassifier()
