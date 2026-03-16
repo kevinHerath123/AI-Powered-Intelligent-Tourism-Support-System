@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Landmark Classifier App - For Streamlit Cloud Deployment"""
 import os
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import tensorflow as tf
@@ -15,10 +16,10 @@ import tempfile
 # -----------------------------------------------------------------------------
 MODEL_PATH = 'FineTuned01-EfficientNetB0_CNN_Model.h5'
 CLASS_NAMES_PATH = 'class_names.json'
-CONFIDENCE_THRESHOLD = 0.75
+CONFIDENCE_THRESHOLD = 0.65  
 
 # -----------------------------------------------------------------------------
-# LOCATION MAPPING
+# LOCATION MAPPING (Match your CLASS_NAMES exactly - NO trailing spaces)
 # -----------------------------------------------------------------------------
 LOCATION_MAP = {
     "Adams Peak": "Rathnapura, Sabaragamuwa Province, Sri Lanka",
@@ -43,7 +44,7 @@ LOCATION_MAP = {
     "Star Fort": "Matara, Southern Province, Sri Lanka",
     "Turtle Hatchery": "Kosgoda, Southern Province, Sri Lanka",
     "Vavuniya Archaeological Museum": "Vavuniya, Northern Province, Sri Lanka",
-    "Wilpattu National Park": "Puttalam, North Western Province, Sri Lanka",
+    "Wilapattu National Park": "Puttalam, North Western Province, Sri Lanka",
     "Yapahuwa Rock Fortress": "Yapahuwa, North Western Province, Sri Lanka",
 }
 
@@ -52,6 +53,7 @@ LOCATION_MAP = {
 # -----------------------------------------------------------------------------
 ocr_reader = None
 face_cascade = None
+
 
 # -----------------------------------------------------------------------------
 # HELPER FUNCTIONS
@@ -68,12 +70,14 @@ def get_ocr_reader():
             return None
     return ocr_reader
 
+
 def get_face_cascade():
     """Lazy load Face Detector"""
     global face_cascade
     if face_cascade is None:
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     return face_cascade
+
 
 def detect_humans(img_array):
     """Returns True if human faces are detected"""
@@ -83,6 +87,36 @@ def detect_humans(img_array):
         return len(faces) > 0
     except:
         return False
+
+
+def flexible_ocr_match(detected_text, landmark_name):
+    """
+    Flexible matching that handles blurry OCR results.
+    Returns True if at least 50% of significant words match.
+    """
+    if not detected_text:
+        return False
+
+    detected_text = detected_text.lower()
+    landmark_lower = landmark_name.lower()
+    landmark_words = landmark_lower.split()
+
+    # Check for direct match first
+    if landmark_lower in detected_text:
+        return True
+
+    # Get significant words (longer than 3 chars)
+    significant_words = [word for word in landmark_words if len(word) > 3]
+
+    if not significant_words:
+        return False
+
+    # Count how many significant words are found in detected text
+    matches = sum(1 for word in significant_words if word in detected_text)
+
+    # Accept if at least 50% of significant words match
+    return matches >= max(1, len(significant_words) // 2)
+
 
 # -----------------------------------------------------------------------------
 # CLASSIFIER CLASS
@@ -96,6 +130,7 @@ class LandmarkClassifier:
         self._load_model()
 
     def _load_model(self):
+        """Load model and class names"""
         if not os.path.exists(self.model_path):
             raise FileNotFoundError(f"Model file not found at {self.model_path}")
         if not os.path.exists(self.classes_path):
@@ -106,6 +141,10 @@ class LandmarkClassifier:
             self.class_names = json.load(f)
 
     def predict(self, image_input):
+        """
+        Predict landmark from image.
+        Returns: {'name': str, 'place': str} OR None if validation fails
+        """
         try:
             # Load Image
             if isinstance(image_input, str):
@@ -130,7 +169,7 @@ class LandmarkClassifier:
             pred_idx = np.argmax(probs)
             confidence = float(np.max(probs))
 
-            # 3. Confidence Validation
+            # 3. Confidence Validation - Lowered threshold for blurry images
             if confidence < CONFIDENCE_THRESHOLD:
                 return None
 
@@ -146,29 +185,27 @@ class LandmarkClassifier:
                         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.jpg')
                         img.save(temp_file.name)
 
-                        # Read text - OCR returns text as-is (preserves case)
-                        ocr_results = ocr.readtext(temp_file.name, detail=0)
+                        # Read text with parameters optimized for blurry images
+                        ocr_results = ocr.readtext(
+                            temp_file.name,
+                            detail=0,
+                            min_size=15,  # Lower min_size for blurry text
+                            contrast_ths=0.03  # Lower contrast threshold
+                        )
+                        detected_text = " ".join(ocr_results)
 
                         # Cleanup
                         os.unlink(temp_file.name)
 
-                        # Convert both OCR text and landmark to lowercase for case-insensitive matching
-                        detected_text = " ".join(ocr_results).lower()
-                        landmark_lower = landmark.lower()
-
-                        # Check if landmark name (or significant parts) appear in detected text
-                        # This handles both uppercase and lowercase text
-                        landmark_keywords = [word for word in landmark_lower.split() if len(word) > 3]
-
-                        # Count how many keywords match
-                        matches = sum(1 for keyword in landmark_keywords if keyword in detected_text)
-
-                        # If at least one significant keyword matches, accept it
-                        if matches == 0 and landmark_keywords:
-                            return None
-
-                    except Exception:
-                        # If OCR fails, still accept if confidence is reasonably high
+                        # Use flexible matching for blurry text
+                        if not flexible_ocr_match(detected_text, landmark):
+                            # If OCR found text but no match, be more lenient
+                            if confidence < 0.85:
+                                return None
+                    except Exception as e:
+                        print(f"OCR Error: {e}")
+                        # If OCR fails completely, rely on CNN confidence
+                        # Accept if confidence is reasonably high
                         if confidence < 0.85:
                             return None
                 else:
@@ -176,6 +213,7 @@ class LandmarkClassifier:
                     if confidence < 0.85:
                         return None
 
+            # Only return name and place (NO confidence)
             return {
                 'name': landmark,
                 'place': location
@@ -185,16 +223,19 @@ class LandmarkClassifier:
             print(f"Prediction Error: {e}")
             return None
 
+
 # -----------------------------------------------------------------------------
 # INITIALIZATION
 # -----------------------------------------------------------------------------
 classifier = None
+
 
 def init_classifier(model_path=MODEL_PATH, classes_path=CLASS_NAMES_PATH):
     """Initialize the classifier manually"""
     global classifier
     classifier = LandmarkClassifier(model_path, classes_path)
     return classifier
+
 
 def get_prediction(image_input):
     """Get prediction - with lazy initialization"""
