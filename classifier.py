@@ -159,7 +159,7 @@ class LandmarkClassifier:
             pred_idx = np.argmax(probs)
             confidence = float(np.max(probs))
 
-            # 3. Confidence Validation - Lowered threshold for blurry images
+            # 3. Confidence Validation
             if confidence < CONFIDENCE_THRESHOLD:
                 return None
 
@@ -175,35 +175,43 @@ class LandmarkClassifier:
                         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.jpg')
                         img.save(temp_file.name)
 
-                        # Read text with parameters optimized for blurry images
-                        ocr_results = ocr.readtext(
-                            temp_file.name,
-                            detail=0,
-                            min_size=15,  # Lower min_size for blurry text
-                            contrast_ths=0.03  # Lower contrast threshold
-                        )
-                        detected_text = " ".join(ocr_results)
+                        # Read text with parameters for better detection
+                        ocr_results = ocr.readtext(temp_file.name, detail=0, min_size=15, contrast_ths=0.05)
+                        detected_text = " ".join(ocr_results).lower()
 
                         # Cleanup
                         os.unlink(temp_file.name)
 
-                        # Use flexible matching for blurry text
-                        if not flexible_ocr_match(detected_text, landmark):
-                            # If OCR found text but no match, be more lenient
-                            if confidence < 0.85:
-                                return None
+                        # More flexible matching - check if ANY significant word matches
+                        landmark_keywords = [word for word in landmark.lower().split() if len(word) > 3]
+                        detected_words = detected_text.split()
+
+                        # Check if any landmark keyword appears in detected text
+                        match_found = any(kw in detected_text for kw in landmark_keywords)
+
+                        # Also check partial matches (e.g., "wilpattu" in "wilpattu national park")
+                        if not match_found:
+                            for kw in landmark_keywords:
+                                for dw in detected_words:
+                                    if kw in dw or dw in kw:
+                                        match_found = True
+                                        break
+                                if match_found:
+                                    break
+
+                        if not match_found and confidence < 0.80:
+                            return None
+
                     except Exception as e:
                         print(f"OCR Error: {e}")
-                        # If OCR fails completely, rely on CNN confidence
-                        # Accept if confidence is reasonably high
-                        if confidence < 0.85:
+                        # If OCR fails, still accept if confidence is reasonably high
+                        if confidence < 0.80:
                             return None
                 else:
                     # If OCR reader failed to load, accept if confidence is high
-                    if confidence < 0.85:
+                    if confidence < 0.80:
                         return None
 
-            # Only return name and place (NO confidence)
             return {
                 'name': landmark,
                 'place': location
@@ -212,7 +220,6 @@ class LandmarkClassifier:
         except Exception as e:
             print(f"Prediction Error: {e}")
             return None
-
 
 # -----------------------------------------------------------------------------
 # INITIALIZATION
