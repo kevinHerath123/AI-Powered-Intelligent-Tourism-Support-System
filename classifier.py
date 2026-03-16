@@ -130,7 +130,7 @@ class LandmarkClassifier:
             pred_idx = np.argmax(probs)
             confidence = float(np.max(probs))
 
-            # 3. Confidence Validation (Reject objects/non-landmarks)
+            # 3. Confidence Validation
             if confidence < CONFIDENCE_THRESHOLD:
                 return None
 
@@ -167,8 +167,7 @@ class LandmarkClassifier:
                         if matches == 0 and landmark_keywords:
                             return None
 
-                    except Exception as e:
-                        print(f"OCR Error: {e}")
+                    except Exception:
                         # If OCR fails, still accept if confidence is reasonably high
                         if confidence < 0.85:
                             return None
@@ -177,7 +176,6 @@ class LandmarkClassifier:
                     if confidence < 0.85:
                         return None
 
-            # Only return name and place (NO confidence)
             return {
                 'name': landmark,
                 'place': location
@@ -186,7 +184,6 @@ class LandmarkClassifier:
         except Exception as e:
             print(f"Prediction Error: {e}")
             return None
-
 
 # -----------------------------------------------------------------------------
 # INITIALIZATION
