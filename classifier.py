@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Landmark Classifier App - For Streamlit Cloud Deployment"""
 import os
-
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import tensorflow as tf
@@ -10,6 +9,7 @@ import numpy as np
 from PIL import Image
 import json
 import tempfile
+import easyocr
 
 # -----------------------------------------------------------------------------
 # CONFIGURATION
@@ -19,7 +19,7 @@ CLASS_NAMES_PATH = 'class_names.json'
 CONFIDENCE_THRESHOLD = 0.75
 
 # -----------------------------------------------------------------------------
-# LOCATION MAPPING
+# LOCATION MAPPING (Match your CLASS_NAMES exactly)
 # -----------------------------------------------------------------------------
 LOCATION_MAP = {
     "Adams Peak": "Rathnapura, Sabaragamuwa Province, Sri Lanka",
@@ -54,21 +54,16 @@ LOCATION_MAP = {
 ocr_reader = None
 face_cascade = None
 
-# -----------------------------------------------------------------------------
-# HELPER FUNCTIONS
-# -----------------------------------------------------------------------------
 def get_ocr_reader():
     """Lazy load EasyOCR only when needed"""
     global ocr_reader
     if ocr_reader is None:
         try:
-            import easyocr
             ocr_reader = easyocr.Reader(['en'], gpu=False, verbose=False)
         except Exception as e:
             print(f"OCR Load Error: {e}")
             return None
     return ocr_reader
-
 
 def get_face_cascade():
     """Lazy load Face Detector"""
@@ -77,15 +72,14 @@ def get_face_cascade():
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     return face_cascade
 
-
 def detect_humans(img_array):
+    """Returns True if human faces are detected"""
     try:
         gray = cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
         faces = get_face_cascade().detectMultiScale(gray, 1.3, 5)
         return len(faces) > 0
     except:
         return False
-
 
 # -----------------------------------------------------------------------------
 # CLASSIFIER CLASS
@@ -133,7 +127,7 @@ class LandmarkClassifier:
             pred_idx = np.argmax(probs)
             confidence = float(np.max(probs))
 
-            # 3. Confidence Validation (Reject objects/non-landmarks)
+            # 3. Confidence Validation
             if confidence < CONFIDENCE_THRESHOLD:
                 return None
 
@@ -145,31 +139,24 @@ class LandmarkClassifier:
                 ocr = get_ocr_reader()
                 if ocr:
                     try:
-                        # Save temp file for OCR
                         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.jpg')
                         img.save(temp_file.name)
 
-                        # Read text
                         ocr_results = ocr.readtext(temp_file.name, detail=0)
                         detected_text = " ".join(ocr_results).lower()
 
-                        # Cleanup
                         os.unlink(temp_file.name)
 
-                        # Verify text match
                         landmark_keywords = landmark.lower().split()
                         match_found = any(keyword in detected_text for keyword in landmark_keywords if len(keyword) > 3)
 
                         if not match_found:
                             return None
                     except Exception:
-                        # If OCR fails, reject moderate confidence predictions
                         return None
                 else:
-                    # If OCR reader failed to load, reject moderate confidence
                     return None
 
-            # Only return name and place (NO confidence)
             return {
                 'name': landmark,
                 'place': location
@@ -179,22 +166,17 @@ class LandmarkClassifier:
             print(f"Prediction Error: {e}")
             return None
 
-
 # -----------------------------------------------------------------------------
 # INITIALIZATION
 # -----------------------------------------------------------------------------
 classifier = None
 
-
 def init_classifier(model_path=MODEL_PATH, classes_path=CLASS_NAMES_PATH):
-    """Initialize the classifier manually"""
     global classifier
     classifier = LandmarkClassifier(model_path, classes_path)
     return classifier
 
-
 def get_prediction(image_input):
-    """Get prediction - with lazy initialization"""
     global classifier
     if classifier is None:
         classifier = LandmarkClassifier()
