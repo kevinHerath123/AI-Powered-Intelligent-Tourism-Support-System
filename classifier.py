@@ -19,7 +19,7 @@ CLASS_NAMES_PATH = 'class_names.json'
 CONFIDENCE_THRESHOLD = 0.75
 
 # -----------------------------------------------------------------------------
-# LOCATION MAPPING (NO trailing spaces - match CLASS_NAMES exactly)
+# LOCATION MAPPING
 # -----------------------------------------------------------------------------
 LOCATION_MAP = {
     "Adams Peak": "Rathnapura, Sabaragamuwa Province, Sri Lanka",
@@ -111,10 +111,6 @@ class LandmarkClassifier:
             self.class_names = json.load(f)
 
     def predict(self, image_input):
-        """
-        Predict landmark from image.
-        Returns: {'name': str, 'place': str} OR None if validation fails
-        """
         try:
             # Load Image
             if isinstance(image_input, str):

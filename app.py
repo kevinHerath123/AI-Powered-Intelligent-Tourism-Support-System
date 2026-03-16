@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import streamlit as st
@@ -15,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for styling (FIXED TYPOS)
+# Custom CSS for styling
 st.markdown("""
 <style>
     .stApp {
@@ -24,23 +23,24 @@ st.markdown("""
     }
 
     .main-title {
-        font-size: 3.5rem;
+        font-size: 1.5rem;  
         font-weight: bold;
         text-align: center;
         color: #ffffff;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        margin: 3rem 0 0.5rem 0 !important;
+        margin: 5rem 0 0.6rem 0 !important;
         padding: 0 !important;
     }
 
     .subtitle {
         text-align: center;
         color: #ede4e4;
-        font-size: 1.5rem;
+        font-size: 0rem;  
         margin: 0rem 0 2.5rem 0 !important;
         padding: 0 !important;
     }
 
+    /* Result card */
     .result-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-radius: 13px;
@@ -53,22 +53,23 @@ st.markdown("""
     .upload-section {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 15px;
-        padding: 0rem !important;
+        padding: 0rem !important;  
         backdrop-filter: blur(10px);
-        margin: 1rem 0 !important;
+        margin: 1rem 0 !important; 
     }
-
+    
+    /* Remove ALL padding/margin from uploader */
     .stFileUploader {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 12px;
-        padding: 1.5rem 1rem !important;
+        padding: 1.5rem 1rem !important;  
         margin: 0.5rem 0 !important;
         border: 1px solid rgba(255, 255, 255, 0.1);
         transition: all 0.3s ease-in-out;
     }
 
     .stFileUploader:hover {
-        background: rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.12);  
         border: 1px solid rgba(255, 255, 255, 0.25);
         box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
     }
@@ -76,24 +77,25 @@ st.markdown("""
     .stFileUploader label {
         margin-top: 0.5rem !important;
         margin-bottom: 0.5rem !important;
-        padding-top: 0.5rem !important;
-        padding-bottom: 0.5rem !important;
+        padding-top: 0.5rem important;
+        padding-bottom: 0.5rem important;
     }
 
     [data-testid="stFileUploader"] {
         margin-top: 0.5rem !important;
         margin-bottom: 0.5rem !important;
-        padding-top: 0.5rem !important;
-        padding-bottom: 0.5rem !important;
+        padding-top: 0.5rem important;
+        padding-bottom: 0.5rem important;
     }
 
     [data-testid="stFileUploader"] label {
         margin-top: 0.5rem !important;
         margin-bottom: 0.5rem !important;
-        padding-top: 0.5rem !important;
-        padding-bottom: 0.5rem !important;
+        padding-top: 0.5rem important;
+        padding-bottom: 0.5rem important;
     }
 
+    /* Footer - full width */
     .footer {
         position: fixed;
         left: 0;
@@ -108,20 +110,24 @@ st.markdown("""
         margin-left: calc(-50vw + 50%);
     }
 
+    /* Hide Streamlit branding */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     .stDeployButton {visibility: hidden;}
 
+    /* Minimize block container padding */
     .block-container {
         padding-top: 0.5rem !important;
         padding-bottom: 4rem !important;
     }
 
+    /* Remove all element margins */
     .element-container {
         margin-top: 0rem !important;
         padding-top: 0rem !important;
     }
 
+    /* Remove section margins */
     section {
         margin-top: 0rem !important;
         padding-top: 0rem !important;
@@ -130,10 +136,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# HERO SECTION
+# TITLE SECTION - NO EXTRA SPACING
 # -----------------------------------------------------------------------------
-st.markdown('<p class="main-title">🏛️ Sri Lanka Landmark Recognition</p>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Discover the beauty of Sri Lanka with AI-powered image recognition</p>',
+st.markdown('<h2 class="main-title">🏛️ Sri Lanka Landmark Recognition</h2>', unsafe_allow_html=True)
+st.markdown('<h5 class="subtitle">Discover the beauty of Sri Lanka with AI-powered image recognition</h5>',
             unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
@@ -141,7 +147,6 @@ st.markdown('<p class="subtitle">Discover the beauty of Sri Lanka with AI-powere
 # -----------------------------------------------------------------------------
 try:
     from classifier import init_classifier
-
     init_classifier()
     st.sidebar.success("✅ Model Ready")
 except Exception as e:
@@ -149,7 +154,7 @@ except Exception as e:
     st.stop()
 
 # -----------------------------------------------------------------------------
-# MAIN CONTENT
+# MAIN CONTENT - NO PADDING
 # -----------------------------------------------------------------------------
 st.markdown('<div class="upload-section">', unsafe_allow_html=True)
 
@@ -166,7 +171,6 @@ if uploaded_file:
     with st.spinner("🔍 Analyzing the image..."):
         result = get_prediction(image)
 
-    # ✅ CHECK IF RESULT IS NONE (FIXES CRASH)
     if result is None:
         st.error("❌ Could not identify landmark. Please upload a clear photo without people.")
     else:
@@ -177,11 +181,12 @@ if uploaded_file:
             <p style="font-size: 1.2rem;"><strong>📍 Location:</strong><br>{result['place'].strip()}</p>
         </div>
         """, unsafe_allow_html=True)
+
 else:
     st.markdown("""
     <div style="text-align: center; padding: 1rem; color: #b8b8b8;">
-        <div style="font-size: 3rem; margin-bottom: 0.5rem;">📸</div>
-        <h3 style="margin: 0.5rem 0; font-size: 1.5rem;">Ready to Explore?</h3>
+        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📸</div>
+        <p style="margin: 0.5rem 0; font-size: 1.2rem;">Ready to Explore?</p>
         <p style="margin: 0.5rem 0; font-size: 1.1rem;">Upload a photo of a Sri Lankan landmark above to get started!</p>
         <p style="font-size: 0.9rem; color: #FCFAFA; margin: 0.5rem 0;">
             💡 Tip: Clear, well-lit photos work best
@@ -192,11 +197,11 @@ else:
 st.markdown('</div>', unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# FOOTER
+# FOOTER - Full Width
 # -----------------------------------------------------------------------------
 st.markdown("""
 <div class="footer">
-    <p style="margin: 0;">🇱🇰 AI-Powered Intelligent Tourism Support System</p>
-    <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; opacity: 0.2;">© 2026</p>
+    <p style="margin: 0; color: #ffffff; opacity: 0.8">AI-Powered Intelligent Tourism Support System</p>
+    <p style="margin: 0.3rem 0 0 0; font-size: 0.7rem; color: #ffffff; opacity: 0.8">© 2026</p>
 </div>
 """, unsafe_allow_html=True)
