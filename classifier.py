@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Landmark Classifier App - For Streamlit Cloud Deployment"""
 import os
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import tensorflow as tf
@@ -8,7 +9,6 @@ import cv2
 import numpy as np
 from PIL import Image
 import json
-import easyocr
 import tempfile
 
 # -----------------------------------------------------------------------------
@@ -19,16 +19,7 @@ CLASS_NAMES_PATH = 'class_names.json'
 CONFIDENCE_THRESHOLD = 0.75
 
 # -----------------------------------------------------------------------------
-# INITIALIZE OCR READER & FACE DETECTOR
-# -----------------------------------------------------------------------------
-# Initialize OCR Reader (only load once)
-ocr_reader = easyocr.Reader(['en'], gpu=False, verbose=False)
-
-# Initialize Human Face Detector (OpenCV Haar Cascade)
-face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-
-# -----------------------------------------------------------------------------
-# LOCATION MAPPING
+# LOCATION MAPPING (NO trailing spaces - match CLASS_NAMES exactly)
 # -----------------------------------------------------------------------------
 LOCATION_MAP = {
     "Adams Peak": "Rathnapura, Sabaragamuwa Province, Sri Lanka",
@@ -63,6 +54,7 @@ LOCATION_MAP = {
 ocr_reader = None
 face_cascade = None
 
+
 def get_ocr_reader():
     """Lazy load EasyOCR only when needed"""
     global ocr_reader
@@ -75,6 +67,7 @@ def get_ocr_reader():
             return None
     return ocr_reader
 
+
 def get_face_cascade():
     """Lazy load Face Detector"""
     global face_cascade
@@ -82,23 +75,19 @@ def get_face_cascade():
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     return face_cascade
 
+
 # -----------------------------------------------------------------------------
 # HELPER FUNCTIONS
 # -----------------------------------------------------------------------------
-def detect_humans(img_path):
-    """Returns True if human faces are detected."""
+def detect_humans(img_array):
+    """Returns True if human faces are detected"""
     try:
-        img_cv = cv2.imread(img_path)
-        if img_cv is None:
-            # Try loading from PIL if cv2.imread fails
-            img_pil = Image.open(img_path).convert('RGB')
-            img_cv = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
-
-        gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+        gray = cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
+        faces = get_face_cascade().detectMultiScale(gray, 1.1, 4)
         return len(faces) > 0
-    except Exception:
+    except:
         return False
+
 
 # -----------------------------------------------------------------------------
 # CLASSIFIER CLASS
@@ -117,24 +106,15 @@ class LandmarkClassifier:
         if not os.path.exists(self.classes_path):
             raise FileNotFoundError(f"Class names file not found at {self.classes_path}")
 
-        try:
-            # Try loading with compile=False to avoid optimizer issues
-            self.model = tf.keras.models.load_model(
-                self.model_path,
-                safe_mode=False,
-                compile=False  # This prevents optimizer deserialization errors
-            )
-        except Exception as e:
-            # If that fails, try without safe_mode
-            self.model = tf.keras.models.load_model(
-                self.model_path,
-                compile=False
-            )
-
+        self.model = tf.keras.models.load_model(self.model_path, safe_mode=False, compile=False)
         with open(self.classes_path, 'r') as f:
             self.class_names = json.load(f)
 
     def predict(self, image_input):
+        """
+        Predict landmark from image.
+        Returns: {'name': str, 'place': str} OR None if validation fails
+        """
         try:
             # Load Image
             if isinstance(image_input, str):
@@ -166,7 +146,7 @@ class LandmarkClassifier:
             landmark = self.class_names[pred_idx].strip()
             location = LOCATION_MAP.get(landmark, "Unknown Location")
 
-            # 4. OCR Verification (Only if confidence is moderate)
+            # 4. OCR Verification (Only if confidence is moderate < 0.90)
             if confidence < 0.90:
                 ocr = get_ocr_reader()
                 if ocr:
@@ -195,7 +175,7 @@ class LandmarkClassifier:
                     # If OCR reader failed to load, reject moderate confidence
                     return None
 
-            # ✅ Only return name and place (NO confidence)
+            # Only return name and place (NO confidence)
             return {
                 'name': landmark,
                 'place': location
@@ -211,11 +191,13 @@ class LandmarkClassifier:
 # -----------------------------------------------------------------------------
 classifier = None
 
+
 def init_classifier(model_path=MODEL_PATH, classes_path=CLASS_NAMES_PATH):
     """Initialize the classifier manually"""
     global classifier
     classifier = LandmarkClassifier(model_path, classes_path)
     return classifier
+
 
 def get_prediction(image_input):
     """Get prediction - with lazy initialization"""
