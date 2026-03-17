@@ -186,9 +186,9 @@ else:
     st.markdown("""
     <div style="text-align: center; padding: 1rem; color: #b8b8b8;">
         <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📸</div>
-        <p style="margin: 0.5rem 0; font-size: 1.2rem; opacity: 0.1">Ready to Explore?</p>
-        <p style="margin: 0.5rem 0; font-size: 1.1rem; opacity: 0.1">Upload a photo of a Sri Lankan landmark above to get started!</p>
-        <p style="font-size: 0.9rem; color: #FCFAFA; margin: 0.5rem 0;">
+        <p style="margin: 0.5rem 0; font-size: 1.2rem; opacity: 0.9">Ready to Explore?</p>
+        <p style="margin: 0.5rem 0; font-size: 1.1rem; opacity: 0.9">Upload a photo of a Sri Lankan landmark above to get started!</p>
+        <p style="font-size: 0.9rem; color: #FCFAFA; margin: 0.5rem 0; opacity: 0.8">
             💡 Tip: Clear, well-lit photos work best
         </p>
     </div>
