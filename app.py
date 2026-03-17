@@ -18,7 +18,7 @@ st.set_page_config(
 st.markdown("""
 <style>
     .stApp {
-        background: linear-gradient(135deg, #0a1a1a 0%, #1a3d3d 50%, #0a2a2a 100%);
+        background: linear-gradient(135deg, #020808 0%, #0a1f1f 50%, #031212 100%);
         min-height: 100vh;
     }
 
@@ -172,7 +172,7 @@ if uploaded_file:
         result = get_prediction(image)
 
     if result is None:
-        st.error("❌ Could not identify landmark. Please upload a clear photo of a landmark.")
+        st.error("❌ Could not identify landmark. Please upload a clear photo of a landmark (no humans).")
     else:
         st.markdown(f"""
         <div class="result-card">

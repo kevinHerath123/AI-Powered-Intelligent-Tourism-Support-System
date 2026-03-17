@@ -7,7 +7,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import tensorflow as tf
 import cv2
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageEnhance
 import json
 import tempfile
 
@@ -16,10 +16,10 @@ import tempfile
 # -----------------------------------------------------------------------------
 MODEL_PATH = 'FineTuned01-EfficientNetB0_CNN_Model.h5'
 CLASS_NAMES_PATH = 'class_names.json'
-CONFIDENCE_THRESHOLD = 0.65
+CONFIDENCE_THRESHOLD = 0.65  # Lowered for blurry images
 
 # -----------------------------------------------------------------------------
-# LOCATION MAPPING (Match your CLASS_NAMES exactly - NO trailing spaces)
+# LOCATION MAPPING (NO trailing spaces)
 # -----------------------------------------------------------------------------
 LOCATION_MAP = {
     "Adams Peak": "Rathnapura, Sabaragamuwa Province, Sri Lanka",
@@ -55,10 +55,8 @@ ocr_reader = None
 face_cascade = None
 
 
-# -----------------------------------------------------------------------------
-# HELPER FUNCTIONS
-# -----------------------------------------------------------------------------
 def get_ocr_reader():
+    """Lazy load EasyOCR only when needed"""
     global ocr_reader
     if ocr_reader is None:
         try:
@@ -71,6 +69,7 @@ def get_ocr_reader():
 
 
 def get_face_cascade():
+    """Lazy load Face Detector"""
     global face_cascade
     if face_cascade is None:
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -78,6 +77,7 @@ def get_face_cascade():
 
 
 def detect_humans(img_array):
+    """Returns True if human faces are detected"""
     try:
         gray = cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
         faces = get_face_cascade().detectMultiScale(gray, 1.3, 5)
@@ -86,9 +86,30 @@ def detect_humans(img_array):
         return False
 
 
-#  Flexible matching that handles blurry OCR results.Returns True if at least 50% of significant words match.
-def flexible_ocr_match(detected_text, landmark_name):
+def enhance_image_for_ocr(img_pil):
+    """
+    Enhance image for better OCR on blurry/low-contrast images
+    """
+    # Increase sharpness significantly
+    enhancer = ImageEnhance.Sharpness(img_pil)
+    img_enhanced = enhancer.enhance(2.5)  # 2.5x sharper
 
+    # Increase contrast significantly
+    enhancer = ImageEnhance.Contrast(img_enhanced)
+    img_enhanced = enhancer.enhance(2.0)  # 2x more contrast
+
+    # Slightly increase brightness
+    enhancer = ImageEnhance.Brightness(img_enhanced)
+    img_enhanced = enhancer.enhance(1.2)  # 1.2x brighter
+
+    return img_enhanced
+
+
+def flexible_ocr_match(detected_text, landmark_name):
+    """
+    Flexible matching that handles blurry OCR results.
+    Returns True if at least one significant word matches.
+    """
     if not detected_text:
         return False
 
@@ -100,17 +121,25 @@ def flexible_ocr_match(detected_text, landmark_name):
     if landmark_lower in detected_text:
         return True
 
-    # Get significant words (longer than 3 chars)
-    significant_words = [word for word in landmark_words if len(word) > 3]
+    # Get significant words (longer than 2 chars)
+    significant_words = [word for word in landmark_words if len(word) > 2]
 
     if not significant_words:
         return False
 
-    # Count how many significant words are found in detected text
-    matches = sum(1 for word in significant_words if word in detected_text)
+    # Check if ANY significant word appears in detected text
+    for word in significant_words:
+        if word in detected_text:
+            return True
 
-    # Accept if at least 50% of significant words match
-    return matches >= max(1, len(significant_words) // 2)
+    # Check partial matches
+    detected_words = detected_text.split()
+    for kw in significant_words:
+        for dw in detected_words:
+            if kw in dw or dw in kw:
+                return True
+
+    return False
 
 
 # -----------------------------------------------------------------------------
@@ -146,7 +175,7 @@ class LandmarkClassifier:
 
             img_array = np.array(img)
 
-            # 1. Human Validation
+            # 1. Human Validation (Reject if faces found)
             if detect_humans(img_array):
                 return None
 
@@ -171,49 +200,54 @@ class LandmarkClassifier:
                 ocr = get_ocr_reader()
                 if ocr:
                     try:
+                        # Try OCR on ENHANCED image first (for blurry images)
+                        enhanced_img = enhance_image_for_ocr(img)
                         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.jpg')
-                        img.save(temp_file.name)
+                        enhanced_img.save(temp_file.name)
 
-                        # Read text - EasyOCR handles both cases fine
-                        ocr_results = ocr.readtext(temp_file.name, detail=0)
-                        detected_text = " ".join(ocr_results).lower()
+                        # Read text with parameters optimized for blurry/low-contrast images
+                        ocr_results = ocr.readtext(
+                            temp_file.name,
+                            detail=0,
+                            min_size=10,
+                            contrast_ths=0.02,
+                            text_threshold=0.2,
+                            link_threshold=0.2
+                        )
+                        detected_text = " ".join(ocr_results)
 
                         os.unlink(temp_file.name)
 
-                        # More flexible matching
-                        landmark_lower = landmark.lower()
+                        # Use flexible matching
+                        if not flexible_ocr_match(detected_text, landmark):
+                            # Try again on original image if enhanced failed
+                            temp_file2 = tempfile.NamedTemporaryFile(delete=False, suffix='.jpg')
+                            img.save(temp_file2.name)
 
-                        # Check if landmark name appears in detected text
-                        if landmark_lower in detected_text:
-                            match_found = True
-                        else:
-                            # Check individual keywords
-                            landmark_keywords = [word for word in landmark_lower.split() if len(word) > 3]
-                            match_found = any(kw in detected_text for kw in landmark_keywords)
+                            ocr_results2 = ocr.readtext(
+                                temp_file2.name,
+                                detail=0,
+                                min_size=10,
+                                contrast_ths=0.02,
+                                text_threshold=0.2,
+                                link_threshold=0.2
+                            )
+                            detected_text2 = " ".join(ocr_results2)
+                            os.unlink(temp_file2.name)
 
-                        # If still no match, try partial matching
-                        if not match_found:
-                            detected_words = detected_text.split()
-                            for kw in landmark_keywords:
-                                for dw in detected_words:
-                                    # Check if words are similar (one contains the other)
-                                    if kw in dw or dw in kw:
-                                        match_found = True
-                                        break
-                                if match_found:
-                                    break
-
-                        # Only reject if confidence is very low AND no OCR match
-                        if not match_found and confidence < 0.80:
-                            return None
+                            if not flexible_ocr_match(detected_text2, landmark):
+                                # If still no match, accept if confidence is high enough
+                                if confidence < 0.75:
+                                    return None
 
                     except Exception as e:
                         print(f"OCR Error: {e}")
-                        # If OCR fails, accept if confidence is reasonably high
-                        if confidence < 0.80:
+                        # If OCR fails completely, accept if confidence is reasonably high
+                        if confidence < 0.75:
                             return None
                 else:
-                    if confidence < 0.80:
+                    # If OCR reader failed to load, accept if confidence is high
+                    if confidence < 0.75:
                         return None
 
             return {
@@ -224,6 +258,7 @@ class LandmarkClassifier:
         except Exception as e:
             print(f"Prediction Error: {e}")
             return None
+
 
 # -----------------------------------------------------------------------------
 # INITIALIZATION
