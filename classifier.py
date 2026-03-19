@@ -7,7 +7,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import tensorflow as tf
 import cv2
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageEnhance
 import json
 import tempfile
 
@@ -85,6 +85,43 @@ def detect_humans(img_array):
     except:
         return False
 
+def enhance_image_for_ocr(img_pil):
+    enhancer = ImageEnhance.Sharpness(img_pil)
+    img_enhanced = enhancer.enhance(2.5)
+    enhancer = ImageEnhance.Contrast(img_enhanced)
+    img_enhanced = enhancer.enhance(2.0)
+    enhancer = ImageEnhance.Brightness(img_enhanced)
+    img_enhanced = enhancer.enhance(1.2)
+    return img_enhanced
+
+
+def ocr_match(detected_text, landmark_name):
+    if not detected_text:
+        return False
+
+    detected_text = detected_text.lower()
+    landmark_lower = landmark_name.lower()
+
+    # Direct match
+    if landmark_lower in detected_text:
+        return True
+
+    # Check each word in landmark name (ignore words <= 2 chars)
+    landmark_words = landmark_lower.split()
+    for word in landmark_words:
+        if len(word) > 2 and word in detected_text:
+            return True
+
+    # Check partial matches
+    detected_words = detected_text.split()
+    for lw in landmark_words:
+        if len(lw) > 2:
+            for dw in detected_words:
+                if lw in dw or dw in lw:
+                    return True
+
+    return False
+
 
 # -----------------------------------------------------------------------------
 # CLASSIFIER CLASS
@@ -119,7 +156,7 @@ class LandmarkClassifier:
 
             img_array = np.array(img)
 
-            # 1. Human Validation (Reject if faces found)
+            # 1. Human Validation
             if detect_humans(img_array):
                 return None
 
@@ -132,63 +169,66 @@ class LandmarkClassifier:
             pred_idx = np.argmax(probs)
             confidence = float(np.max(probs))
 
+            print(f"DEBUG: CNN Confidence = {confidence:.2f}, Prediction = {self.class_names[pred_idx]}")
+
             # 3. Confidence Validation
             if confidence < CONFIDENCE_THRESHOLD:
+                print(f"DEBUG: Rejected - Low confidence ({confidence:.2f} < {CONFIDENCE_THRESHOLD})")
                 return None
 
             landmark = self.class_names[pred_idx].strip()
             location = LOCATION_MAP.get(landmark, "Unknown Location")
 
-            # 4. OCR Verification (Only if confidence is moderate < 0.90)
+            # 4. OCR Verification (Only if confidence < 0.90)
             if confidence < 0.90:
                 ocr = get_ocr_reader()
                 if ocr:
                     try:
+                        # Try enhanced image first
+                        enhanced_img = enhance_image_for_ocr(img)
                         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.jpg')
-                        img.save(temp_file.name)
+                        enhanced_img.save(temp_file.name)
 
-                        # Read text with optimized parameters
                         ocr_results = ocr.readtext(
                             temp_file.name,
                             detail=0,
                             min_size=10,
-                            contrast_ths=0.03,
-                            text_threshold=0.3
+                            contrast_ths=0.02,
+                            text_threshold=0.2
                         )
-                        detected_text = " ".join(ocr_results).lower()
-
+                        detected_text = " ".join(ocr_results)
                         os.unlink(temp_file.name)
 
-                        # VERY FLEXIBLE MATCHING - Check if ANY word matches
-                        landmark_lower = landmark.lower()
-                        landmark_words = landmark_lower.split()
+                        print(f"DEBUG: OCR Detected = '{detected_text}'")
+                        print(f"DEBUG: Landmark = '{landmark}'")
 
-                        # Check if landmark name or any significant word appears
-                        match_found = False
-
-                        # Direct match
-                        if landmark_lower in detected_text:
-                            match_found = True
+                        if ocr_match(detected_text, landmark):
+                            print("DEBUG: OCR Match = SUCCESS")
                         else:
-                            # Check individual words (length > 2)
-                            for word in landmark_words:
-                                if len(word) > 2 and word in detected_text:
-                                    match_found = True
-                                    break
+                            print("DEBUG: OCR Match = FAILED")
+                            # Try original image
+                            temp_file2 = tempfile.NamedTemporaryFile(delete=False, suffix='.jpg')
+                            img.save(temp_file2.name)
+                            ocr_results2 = ocr.readtext(temp_file2.name, detail=0, min_size=10, contrast_ths=0.02)
+                            detected_text2 = " ".join(ocr_results2)
+                            os.unlink(temp_file2.name)
 
-                        # If still no match, accept if confidence is high enough
-                        if not match_found and confidence < 0.80:
-                            return None
+                            print(f"DEBUG: OCR (original) = '{detected_text2}'")
+
+                            if not ocr_match(detected_text2, landmark):
+                                if confidence < 0.75:
+                                    print(f"DEBUG: Rejected - OCR failed + low confidence")
+                                    return None
 
                     except Exception as e:
-                        print(f"OCR Error: {e}")
-                        # If OCR fails, accept if confidence is reasonably high
-                        if confidence < 0.80:
+                        print(f"DEBUG: OCR Error = {e}")
+                        if confidence < 0.75:
                             return None
                 else:
-                    # If OCR reader failed to load, accept if confidence is high
-                    if confidence < 0.80:
+                    if confidence < 0.75:
                         return None
+            else:
+                print("DEBUG: OCR Skipped - High confidence (>= 0.90)")
 
             return {
                 'name': landmark,
