@@ -7,7 +7,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import tensorflow as tf
 import cv2
 import numpy as np
-from PIL import Image, ImageEnhance
+from PIL import Image
 import json
 import tempfile
 
@@ -86,62 +86,6 @@ def detect_humans(img_array):
         return False
 
 
-def enhance_image_for_ocr(img_pil):
-    """
-    Enhance image for better OCR on blurry/low-contrast images
-    """
-    # Increase sharpness significantly
-    enhancer = ImageEnhance.Sharpness(img_pil)
-    img_enhanced = enhancer.enhance(2.5)  # 2.5x sharper
-
-    # Increase contrast significantly
-    enhancer = ImageEnhance.Contrast(img_enhanced)
-    img_enhanced = enhancer.enhance(2.0)  # 2x more contrast
-
-    # Slightly increase brightness
-    enhancer = ImageEnhance.Brightness(img_enhanced)
-    img_enhanced = enhancer.enhance(1.2)  # 1.2x brighter
-
-    return img_enhanced
-
-
-def flexible_ocr_match(detected_text, landmark_name):
-    """
-    Flexible matching that handles blurry OCR results.
-    Returns True if at least one significant word matches.
-    """
-    if not detected_text:
-        return False
-
-    detected_text = detected_text.lower()
-    landmark_lower = landmark_name.lower()
-    landmark_words = landmark_lower.split()
-
-    # Check for direct match first
-    if landmark_lower in detected_text:
-        return True
-
-    # Get significant words (longer than 2 chars)
-    significant_words = [word for word in landmark_words if len(word) > 2]
-
-    if not significant_words:
-        return False
-
-    # Check if ANY significant word appears in detected text
-    for word in significant_words:
-        if word in detected_text:
-            return True
-
-    # Check partial matches
-    detected_words = detected_text.split()
-    for kw in significant_words:
-        for dw in detected_words:
-            if kw in dw or dw in kw:
-                return True
-
-    return False
-
-
 # -----------------------------------------------------------------------------
 # CLASSIFIER CLASS
 # -----------------------------------------------------------------------------
@@ -200,54 +144,50 @@ class LandmarkClassifier:
                 ocr = get_ocr_reader()
                 if ocr:
                     try:
-                        # Try OCR on ENHANCED image first (for blurry images)
-                        enhanced_img = enhance_image_for_ocr(img)
                         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.jpg')
-                        enhanced_img.save(temp_file.name)
+                        img.save(temp_file.name)
 
-                        # Read text with parameters optimized for blurry/low-contrast images
+                        # Read text with optimized parameters
                         ocr_results = ocr.readtext(
                             temp_file.name,
                             detail=0,
                             min_size=10,
-                            contrast_ths=0.02,
-                            text_threshold=0.2,
-                            link_threshold=0.2
+                            contrast_ths=0.03,
+                            text_threshold=0.3
                         )
-                        detected_text = " ".join(ocr_results)
+                        detected_text = " ".join(ocr_results).lower()
 
                         os.unlink(temp_file.name)
 
-                        # Use flexible matching
-                        if not flexible_ocr_match(detected_text, landmark):
-                            # Try again on original image if enhanced failed
-                            temp_file2 = tempfile.NamedTemporaryFile(delete=False, suffix='.jpg')
-                            img.save(temp_file2.name)
+                        # VERY FLEXIBLE MATCHING - Check if ANY word matches
+                        landmark_lower = landmark.lower()
+                        landmark_words = landmark_lower.split()
 
-                            ocr_results2 = ocr.readtext(
-                                temp_file2.name,
-                                detail=0,
-                                min_size=10,
-                                contrast_ths=0.02,
-                                text_threshold=0.2,
-                                link_threshold=0.2
-                            )
-                            detected_text2 = " ".join(ocr_results2)
-                            os.unlink(temp_file2.name)
+                        # Check if landmark name or any significant word appears
+                        match_found = False
 
-                            if not flexible_ocr_match(detected_text2, landmark):
-                                # If still no match, accept if confidence is high enough
-                                if confidence < 0.75:
-                                    return None
+                        # Direct match
+                        if landmark_lower in detected_text:
+                            match_found = True
+                        else:
+                            # Check individual words (length > 2)
+                            for word in landmark_words:
+                                if len(word) > 2 and word in detected_text:
+                                    match_found = True
+                                    break
+
+                        # If still no match, accept if confidence is high enough
+                        if not match_found and confidence < 0.80:
+                            return None
 
                     except Exception as e:
                         print(f"OCR Error: {e}")
-                        # If OCR fails completely, accept if confidence is reasonably high
-                        if confidence < 0.75:
+                        # If OCR fails, accept if confidence is reasonably high
+                        if confidence < 0.80:
                             return None
                 else:
                     # If OCR reader failed to load, accept if confidence is high
-                    if confidence < 0.75:
+                    if confidence < 0.80:
                         return None
 
             return {
